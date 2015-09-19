@@ -19,6 +19,7 @@ public:
 private:
     void initWindow();
     void initWidgets();
+    void populateMenu();
     QRect screenRect;
 };
 

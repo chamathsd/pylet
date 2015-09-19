@@ -6,6 +6,8 @@
 #include "pylet_window.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
+#include <qmenubar.h>
+#include <qlayout.h>
 
 PyletWindow::PyletWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -14,6 +16,7 @@ PyletWindow::PyletWindow(QWidget *parent) :
     screenRect = desktop->screen()->rect();
 
     initWindow();
+    initWidgets();
     show();
 }
 
@@ -26,4 +29,27 @@ void PyletWindow::initWindow()
     showMaximized();
 
     setWindowTitle("Pylet (Editor)"); 
+}
+
+void PyletWindow::initWidgets()
+{
+    populateMenu();
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    setLayout(mainLayout);
+
+    mainLayout->addStretch();
+
+    statusBar();
+}
+
+void PyletWindow::populateMenu()
+{
+    menuBar()->addMenu("File");
+    menuBar()->addMenu("Edit");
+    menuBar()->addMenu("Search");
+    menuBar()->addMenu("Run");
+    menuBar()->addMenu("View");
+    menuBar()->addMenu("Settings");
+    menuBar()->addMenu("Help");
 }
