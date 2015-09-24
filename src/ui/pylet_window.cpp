@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2015 Jake Schadaway. All rights reserved.
+* Copyright (c) 2015 Jake Schadaway.
 * Licensed under the MIT License. See LICENSE.md for details.
 */
 
