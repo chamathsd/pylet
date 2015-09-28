@@ -10,20 +10,17 @@ endif()
 
 project(pylet)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCE
-    src/pylet.cpp
+	src/pylet.cpp
 	src/ui/pylet_window.cpp
-)
-
-set(HEADERS
-    src/ui/pylet_window.h
-)
-
-set(FORMS
-    src/pylet_window.ui
+	src/ui/pylet_window.h
+	src/ui/code_editor_interface.cpp
+	src/ui/code_editor_interface.h
+	src/ui/code_editor_numbers.h 
 )
 
 # set(RESOURCES)
@@ -45,7 +42,6 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
-qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 # qt5_add_resources(UI_RESOURCES ${RESOURCES})
 
 include_directories(
@@ -54,12 +50,10 @@ include_directories(
     ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
-    src
 )
 add_executable(pylet
     ${GUI_TYPE}
-    ${SOURCE}
-    ${FORMS_HEADERS}
+	${SOURCE}
     # ${UI_RESOURCES}
 )
 target_link_libraries(pylet
@@ -67,6 +61,10 @@ target_link_libraries(pylet
     Qt5::Core
     Qt5::Gui
 )
+if(MSVC)
+	source_group("src" REGULAR_EXPRESSION "src/[^/.]*\.")
+	source_group("src\\ui" REGULAR_EXPRESSION "src/ui.*\.")
+endif()
 
 # --- RUNTIME DEPENDENCIES ---
 # Only necessary on Windows.

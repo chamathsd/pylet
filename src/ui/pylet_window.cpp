@@ -4,9 +4,9 @@
 */
 
 #include "pylet_window.h"
+#include "code_editor_interface.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
-#include <qplaintextedit.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -25,7 +25,7 @@ PyletWindow::PyletWindow(QWidget *parent) :
 
 void PyletWindow::initWindow()
 {
-    setMinimumSize(400, 400);
+    setMinimumSize(600, 400);
     int screenWidth = screenRect.width();
     int screenHeight = screenRect.height();
     resize(screenWidth - 250, screenHeight - 250);
@@ -47,7 +47,7 @@ void PyletWindow::initWidgets()
     navLayout->setMargin(0);
     navLayout->setSpacing(0);
     navigator->setLayout(navLayout);
-    navigator->setMinimumWidth(280);
+    navigator->setMaximumWidth(280);
     coreWidget->insertWidget(0, navigator);
 
     QLabel* crawler = new QLabel(navigator);
@@ -62,10 +62,7 @@ void PyletWindow::initWidgets()
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    QLabel* codeEditor = new QLabel(coreWidget);
-    codeEditor->setStyleSheet("background-color: blue; color: white; font-size: 40px;");
-    codeEditor->setAlignment(Qt::AlignCenter);
-    codeEditor->setText("Code Editor");
+	CodeEditor* codeEditor = new CodeEditor(coreWidget);
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 
