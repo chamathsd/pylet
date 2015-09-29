@@ -15,12 +15,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(SOURCE
-	src/pylet.cpp
-	src/ui/pylet_window.cpp
-	src/ui/pylet_window.h
-	src/ui/code_editor_interface.cpp
-	src/ui/code_editor_interface.h
-	src/ui/code_editor_numbers.h 
+    src/pylet.cpp
+    src/ui/pylet_window.cpp
+    src/ui/pylet_window.h
+    src/ui/code_editor_interface.cpp
+    src/ui/code_editor_interface.h
+    src/ui/code_editor_numbers.h 
 )
 
 # set(RESOURCES)
@@ -53,7 +53,7 @@ include_directories(
 )
 add_executable(pylet
     ${GUI_TYPE}
-	${SOURCE}
+    ${SOURCE}
     # ${UI_RESOURCES}
 )
 target_link_libraries(pylet
@@ -62,8 +62,8 @@ target_link_libraries(pylet
     Qt5::Gui
 )
 if(MSVC)
-	source_group("src" REGULAR_EXPRESSION "src/[^/.]*\.")
-	source_group("src\\ui" REGULAR_EXPRESSION "src/ui.*\.")
+    source_group("src" REGULAR_EXPRESSION "src/[^/.]*\.")
+    source_group("src\\ui" REGULAR_EXPRESSION "src/ui.*\.")
 endif()
 
 # --- RUNTIME DEPENDENCIES ---

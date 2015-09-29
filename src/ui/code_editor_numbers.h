@@ -14,24 +14,24 @@
 
 class LineNumberWidget : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	LineNumberWidget(CodeEditor *editor) : QWidget(editor) {
-		codeEditor = editor;
-	}
+    LineNumberWidget(CodeEditor *editor) : QWidget(editor) {
+        codeEditor = editor;
+    }
 
-	QSize sizeHint() const Q_DECL_OVERRIDE{
-		return QSize(codeEditor->lineNumbersWidth(), 0);
-	}
+    QSize sizeHint() const Q_DECL_OVERRIDE{
+        return QSize(codeEditor->lineNumbersWidth(), 0);
+    }
 
 protected:
-	void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE{
-		codeEditor->lineNumbersPaintEvent(event);
-	}
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE{
+        codeEditor->lineNumbersPaintEvent(event);
+    }
 
 private:
-	CodeEditor *codeEditor;
+    CodeEditor *codeEditor;
 };
 
 #endif // CODE_EDITOR_NUMBERS_H

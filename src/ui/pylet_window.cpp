@@ -62,7 +62,7 @@ void PyletWindow::initWidgets()
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-	CodeEditor* codeEditor = new CodeEditor(coreWidget);
+    CodeEditor* codeEditor = new CodeEditor(coreWidget);
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 

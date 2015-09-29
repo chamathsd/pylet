@@ -13,24 +13,24 @@
 
 class CodeEditor : public QPlainTextEdit
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	CodeEditor(QWidget *parent = 0);
+    CodeEditor(QWidget *parent = 0);
 
-	void lineNumbersPaintEvent(QPaintEvent *event);
-	int lineNumbersWidth();
+    void lineNumbersPaintEvent(QPaintEvent *event);
+    int lineNumbersWidth();
 
 protected:
-	void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
-	void updateLineNumbersWidth(int newBlockCount);
-	void highlightCurrentLine();
-	void updateLineNumbersArea(const QRect &, int);
+    void updateLineNumbersWidth(int newBlockCount);
+    void highlightCurrentLine();
+    void updateLineNumbersArea(const QRect &, int);
 
 private:
-	QWidget *lineNumbers;
+    QWidget *lineNumbers;
 };
 
 #endif // CODE_EDITOR_INTERFACE_H
