@@ -36,7 +36,7 @@ int CodeEditor::lineNumbersWidth()
 
     int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 
-    return space;
+    return space + 5; /* width offset */
 }
 
 void CodeEditor::updateLineNumbersWidth(int /* newBlockCount */)
@@ -78,7 +78,7 @@ void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
         {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::black);
-            painter.drawText(0, top, lineNumbers->width(), fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(-3, top, lineNumbers->width(), fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block = block.next();
