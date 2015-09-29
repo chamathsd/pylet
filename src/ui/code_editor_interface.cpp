@@ -15,14 +15,16 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
 {
     lineNumbers = new LineNumberWidget(this);
 
-    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumbersWidth(int)));
-    connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumbersArea(QRect, int)));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-
     updateLineNumbersWidth(0);
     highlightCurrentLine();
     
     this->setFont(monoFont);
+    this->setWordWrapMode(QTextOption::NoWrap);
+    this->setTabStopWidth(4 * fontMetrics().width(' '));
+
+    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumbersWidth(int)));
+    connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumbersArea(QRect, int)));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 }
 
 int CodeEditor::lineNumbersWidth()
