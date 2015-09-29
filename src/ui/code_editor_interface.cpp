@@ -29,7 +29,8 @@ int CodeEditor::lineNumbersWidth()
 {
     int digits = 1;
     int max = qMax(1, blockCount());
-    while (max >= 10) {
+    while (max >= 10) 
+    {
         max /= 10;
         ++digits;
     }
