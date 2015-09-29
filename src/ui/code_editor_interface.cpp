@@ -21,6 +21,11 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
 
 	updateLineNumbersWidth(0);
 	highlightCurrentLine();
+
+	QTextDocument *doc = this->document();
+	QFont monoFont = doc->defaultFont();
+	monoFont.setFamily("Courier New");
+	doc->setDefaultFont(monoFont);
 }
 
 int CodeEditor::lineNumbersWidth()
