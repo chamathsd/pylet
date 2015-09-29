@@ -22,10 +22,9 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
     updateLineNumbersWidth(0);
     highlightCurrentLine();
 
-    QTextDocument *doc = this->document();
-    QFont monoFont = doc->defaultFont();
-    monoFont.setFamily("Courier New");
-    doc->setDefaultFont(monoFont);
+    // QTextDocument *doc = this->document();
+    // QFont monoFont("Courier New", 12, QFont::Normal, false);
+    // doc->setDefaultFont(monoFont);
 }
 
 int CodeEditor::lineNumbersWidth()
@@ -106,7 +105,7 @@ void CodeEditor::highlightCurrentLine()
     {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::yellow).lighter(160);
+        QColor lineColor = QColor(Qt::blue).lighter(190);
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
