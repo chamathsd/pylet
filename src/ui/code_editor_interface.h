@@ -31,6 +31,7 @@ private slots:
 
 private:
     QWidget *lineNumbers;
+    QFont monoFont = QFont("Courier New", 10, QFont::Normal, false);
 };
 
 #endif // CODE_EDITOR_INTERFACE_H

@@ -21,10 +21,8 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
 
     updateLineNumbersWidth(0);
     highlightCurrentLine();
-
-    // QTextDocument *doc = this->document();
-    // QFont monoFont("Courier New", 12, QFont::Normal, false);
-    // doc->setDefaultFont(monoFont);
+    
+    this->setFont(monoFont);
 }
 
 int CodeEditor::lineNumbersWidth()
@@ -67,6 +65,7 @@ void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumbers);
     painter.fillRect(event->rect(), Qt::lightGray);
+    painter.setFont(monoFont);
 
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
