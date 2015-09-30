@@ -20,14 +20,17 @@ public:
 
     void lineNumbersPaintEvent(QPaintEvent *event);
     int lineNumbersWidth();
+    int tabSpacing;
+    bool tabsEmitSpaces;
 
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
     void updateLineNumbersWidth(int newBlockCount);
-    void highlightCurrentLine();
     void updateLineNumbersArea(const QRect &, int);
+    void highlightCurrentLine();
 
 private:
     QWidget *lineNumbers;

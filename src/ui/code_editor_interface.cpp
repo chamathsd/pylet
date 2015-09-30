@@ -8,6 +8,7 @@
 
 #include "code_editor_interface.h"
 #include "code_editor_numbers.h"
+#include <qcoreapplication.h>
 #include <qtextobject.h>
 #include <qpainter.h>
 
@@ -17,10 +18,14 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
 
     updateLineNumbersWidth(0);
     highlightCurrentLine();
-    
-    this->setFont(monoFont);
-    this->setWordWrapMode(QTextOption::NoWrap);
-    this->setTabStopWidth(4 * fontMetrics().width(' '));
+
+    /* Stuff to move to QSettings later. */
+    tabSpacing = 4;
+    tabsEmitSpaces = true;
+
+    setFont(monoFont);
+    setWordWrapMode(QTextOption::NoWrap);
+    setTabStopWidth(tabSpacing * fontMetrics().width(' '));
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumbersWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumbersArea(QRect, int)));
@@ -37,9 +42,9 @@ int CodeEditor::lineNumbersWidth()
         ++digits;
     }
 
-    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+    int space = fontMetrics().width(QLatin1Char('9')) * digits;
 
-    return space + 5; /* width offset */
+    return space + 20; /* width offset */
 }
 
 void CodeEditor::updateLineNumbersWidth(int /* newBlockCount */)
@@ -67,7 +72,9 @@ void CodeEditor::updateLineNumbersArea(const QRect &rect, int dy)
 void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumbers);
-    painter.fillRect(event->rect(), Qt::lightGray);
+    QRect lineNumberBG = event->rect();
+    lineNumberBG.setWidth(lineNumberBG.width() - 5);
+    painter.fillRect(lineNumberBG, Qt::lightGray);
     painter.setFont(monoFont);
 
     QTextBlock block = firstVisibleBlock();
@@ -81,7 +88,7 @@ void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
         {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::black);
-            painter.drawText(-3, top, lineNumbers->width(), fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(-15, top, lineNumbers->width(), fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block = block.next();
@@ -97,6 +104,27 @@ void CodeEditor::resizeEvent(QResizeEvent *event)
 
     QRect cr = contentsRect();
     lineNumbers->setGeometry(QRect(cr.left(), cr.top(), lineNumbersWidth(), cr.height()));
+}
+
+void CodeEditor::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_Tab:
+            if (tabsEmitSpaces)
+            {
+                event->accept();
+                this->textCursor().insertText(QString(tabSpacing, ' '));
+            }
+            else
+            {
+                QPlainTextEdit::keyPressEvent(event);
+            }
+            break;
+        default:
+            QPlainTextEdit::keyPressEvent(event);
+            break;
+    }
 }
 
 void CodeEditor::highlightCurrentLine()
