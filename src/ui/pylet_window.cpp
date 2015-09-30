@@ -4,7 +4,6 @@
 */
 
 #include "pylet_window.h"
-#include "code_editor_interface.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qmenubar.h>
@@ -35,10 +34,6 @@ void PyletWindow::initWindow()
 
 void PyletWindow::initWidgets()
 {
-    populateMenu();
-    addToolBar("Action Bar");
-    statusBar();
-
     QSplitter* coreWidget = new QSplitter(Qt::Horizontal);
     setCentralWidget(coreWidget);
 
@@ -62,7 +57,7 @@ void PyletWindow::initWidgets()
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    CodeEditor* codeEditor = new CodeEditor(coreWidget);
+    codeEditor = new CodeEditor(coreWidget);
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 
@@ -78,15 +73,32 @@ void PyletWindow::initWidgets()
     coreWidget->setStretchFactor(2, 3);
 
     coreWidget->setMidLineWidth(8);
+
+    populateMenu();
+    addToolBar("Action Bar");
+    statusBar();
 }
 
 void PyletWindow::populateMenu()
 {
-    menuBar()->addMenu("File");
-    menuBar()->addMenu("Edit");
-    menuBar()->addMenu("Search");
-    menuBar()->addMenu("Run");
-    menuBar()->addMenu("View");
-    menuBar()->addMenu("Settings");
-    menuBar()->addMenu("Help");
+    QAction* undo = new QAction(this);
+    undo->setText("Undo");
+    undo->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    connect(undo, SIGNAL(triggered()), codeEditor, SLOT(undo()));
+
+    QAction* redo = new QAction(this);
+    redo->setText("Redo");
+    redo->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    connect(redo, SIGNAL(triggered()), codeEditor, SLOT(redo()));
+
+    QMenu *fileMenu = menuBar()->addMenu("File");
+    QMenu *editMenu = menuBar()->addMenu("Edit");
+    QMenu *searchMenu = menuBar()->addMenu("Search");
+    QMenu *runMenu = menuBar()->addMenu("Run");
+    QMenu *viewMenu = menuBar()->addMenu("View");
+    QMenu *settingsMenu = menuBar()->addMenu("Settings");
+    QMenu *helpMenu = menuBar()->addMenu("Help");
+
+    editMenu->addAction(undo);
+    editMenu->addAction(redo);
 }

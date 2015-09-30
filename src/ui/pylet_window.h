@@ -6,6 +6,7 @@
 #ifndef PYLET_WINDOW_H
 #define PYLET_WINDOW_H
 
+#include "code_editor_interface.h"
 #include <qmainwindow.h>
 #include <qevent.h>
 
@@ -20,6 +21,7 @@ private:
     void initWindow();
     void initWidgets();
     void populateMenu();
+    CodeEditor *codeEditor;
     QRect screenRect;
 };
 
