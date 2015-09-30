@@ -91,14 +91,40 @@ void PyletWindow::populateMenu()
     redo->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     connect(redo, SIGNAL(triggered()), codeEditor, SLOT(redo()));
 
+    QAction* cut = new QAction(this);
+    cut->setText("Cut");
+    cut->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    connect(cut, SIGNAL(triggered()), codeEditor, SLOT(cut()));
+
+    QAction* copy = new QAction(this);
+    copy->setText("Copy");
+    copy->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    connect(copy, SIGNAL(triggered()), codeEditor, SLOT(copy()));
+
+    QAction* paste = new QAction(this);
+    paste->setText("Paste");
+    paste->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    connect(paste, SIGNAL(triggered()), codeEditor, SLOT(paste()));
+
+    QAction* selectAll = new QAction(this);
+    selectAll->setText("Select All");
+    selectAll->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
+    connect(selectAll, SIGNAL(triggered()), codeEditor, SLOT(selectAll()));
+
     QMenu *fileMenu = menuBar()->addMenu("File");
     QMenu *editMenu = menuBar()->addMenu("Edit");
+        editMenu->addAction(undo);
+        editMenu->addAction(redo);
+        editMenu->addSeparator();
+        editMenu->addAction(cut);
+        editMenu->addAction(copy);
+        editMenu->addAction(paste);
+        editMenu->addAction(selectAll);
     QMenu *searchMenu = menuBar()->addMenu("Search");
     QMenu *runMenu = menuBar()->addMenu("Run");
     QMenu *viewMenu = menuBar()->addMenu("View");
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     QMenu *helpMenu = menuBar()->addMenu("Help");
 
-    editMenu->addAction(undo);
-    editMenu->addAction(redo);
+
 }
