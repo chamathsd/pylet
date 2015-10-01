@@ -17,10 +17,19 @@ PyletWindow::PyletWindow(QWidget *parent) :
     QDesktopWidget *desktop = QApplication::desktop();
     screenRect = desktop->screen()->rect();
 
+    s = new QSettings("config.ini", QSettings::IniFormat);
+
     initWindow();
     initWidgets();
     showMaximized();
 }
+
+PyletWindow::~PyletWindow()
+{
+    /* Clean up QSettings that were passed around. */
+    delete s;
+}
+
 
 void PyletWindow::initWindow()
 {
@@ -57,7 +66,7 @@ void PyletWindow::initWidgets()
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    codeEditor = new CodeEditor(coreWidget);
+    codeEditor = new CodeEditor(s, coreWidget);
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 
@@ -81,35 +90,31 @@ void PyletWindow::initWidgets()
 
 void PyletWindow::populateMenu()
 {
-    QAction* undo = new QAction(this);
-    undo->setText("Undo");
-    undo->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    QList<QAction*> actions;
+
+    QAction* undo = new QAction("Undo", this); actions << undo;
     connect(undo, SIGNAL(triggered()), codeEditor, SLOT(undo()));
 
-    QAction* redo = new QAction(this);
-    redo->setText("Redo");
-    redo->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    QAction* redo = new QAction("Redo", this); actions << redo;
     connect(redo, SIGNAL(triggered()), codeEditor, SLOT(redo()));
 
-    QAction* cut = new QAction(this);
-    cut->setText("Cut");
-    cut->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    QAction* cut = new QAction("Cut", this); actions << cut;
     connect(cut, SIGNAL(triggered()), codeEditor, SLOT(cut()));
 
-    QAction* copy = new QAction(this);
-    copy->setText("Copy");
-    copy->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    QAction* copy = new QAction("Copy", this); actions << copy;
     connect(copy, SIGNAL(triggered()), codeEditor, SLOT(copy()));
 
-    QAction* paste = new QAction(this);
-    paste->setText("Paste");
-    paste->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    QAction* paste = new QAction("Paste", this); actions << paste;
     connect(paste, SIGNAL(triggered()), codeEditor, SLOT(paste()));
 
-    QAction* selectAll = new QAction(this);
-    selectAll->setText("Select All");
-    selectAll->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
+    QAction* selectAll = new QAction("Select All", this); actions << selectAll;
     connect(selectAll, SIGNAL(triggered()), codeEditor, SLOT(selectAll()));
+
+    for (int i = 0; i < actions.size(); ++i)
+    {
+        QAction *a = actions.at(i);
+        a->setShortcut(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
+    }
 
     QMenu *fileMenu = menuBar()->addMenu("File");
     QMenu *editMenu = menuBar()->addMenu("Edit");
@@ -125,6 +130,4 @@ void PyletWindow::populateMenu()
     QMenu *viewMenu = menuBar()->addMenu("View");
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     QMenu *helpMenu = menuBar()->addMenu("Help");
-
-
 }

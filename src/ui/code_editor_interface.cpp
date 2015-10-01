@@ -12,7 +12,7 @@
 #include <qtextobject.h>
 #include <qpainter.h>
 
-CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
 {
     lineNumbers = new LineNumberWidget(this);
 
@@ -20,8 +20,8 @@ CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent)
     highlightCurrentLine();
 
     /* Stuff to move to QSettings later. */
-    tabSpacing = 4;
-    tabsEmitSpaces = true;
+    tabSpacing = s->value("Editor/iTabSpacing").toInt();
+    tabsEmitSpaces = s->value("Editor/bTabsEmitSpaces").toBool();
 
     setFont(monoFont);
     setWordWrapMode(QTextOption::NoWrap);

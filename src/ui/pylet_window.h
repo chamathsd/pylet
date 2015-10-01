@@ -8,6 +8,7 @@
 
 #include "code_editor_interface.h"
 #include <qmainwindow.h>
+#include <qsettings.h>
 #include <qevent.h>
 
 class PyletWindow : public QMainWindow
@@ -16,12 +17,14 @@ class PyletWindow : public QMainWindow
 
 public:
     explicit PyletWindow(QWidget *parent = 0);
+    ~PyletWindow();
 
 private:
     void initWindow();
     void initWidgets();
     void populateMenu();
     CodeEditor *codeEditor;
+    QSettings *s;
     QRect screenRect;
 };
 

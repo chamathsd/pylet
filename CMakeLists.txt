@@ -16,6 +16,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(SOURCE
     src/pylet.cpp
+    src/init.h
     src/ui/pylet_window.cpp
     src/ui/pylet_window.h
     src/ui/code_editor_interface.cpp

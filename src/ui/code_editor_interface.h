@@ -10,13 +10,14 @@
 #define CODE_EDITOR_INTERFACE_H
 
 #include <qplaintextedit.h>
+#include <qsettings.h>
 
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent = 0);
+    CodeEditor(QSettings *s, QWidget *parent = 0);
 
     void lineNumbersPaintEvent(QPaintEvent *event);
     int lineNumbersWidth();
