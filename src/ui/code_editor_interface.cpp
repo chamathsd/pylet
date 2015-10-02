@@ -11,6 +11,7 @@
 #include <qcoreapplication.h>
 #include <qtextobject.h>
 #include <qpainter.h>
+#include <qdebug.h>
 
 CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
 {
@@ -19,7 +20,6 @@ CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
     updateLineNumbersWidth(0);
     highlightCurrentLine();
 
-    /* Stuff to move to QSettings later. */
     tabSpacing = s->value("Editor/iTabSpacing").toInt();
     tabsEmitSpaces = s->value("Editor/bTabsEmitSpaces").toBool();
 
@@ -145,4 +145,21 @@ void CodeEditor::highlightCurrentLine()
     }
 
     setExtraSelections(extraSelection);
+}
+
+void CodeEditor::zoomInSlot()
+{
+    this->zoomIn(20);
+}
+
+void CodeEditor::zoomOutSlot()
+{
+    this->zoomOut(20);
+}
+
+void CodeEditor::resetZoom()
+{
+    QFont f = font();
+    f.setPointSize(10);
+    setFont(f);
 }

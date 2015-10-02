@@ -32,6 +32,9 @@ private slots:
     void updateLineNumbersWidth(int newBlockCount);
     void updateLineNumbersArea(const QRect &, int);
     void highlightCurrentLine();
+    void zoomInSlot();
+    void zoomOutSlot();
+    void resetZoom();
 
 private:
     QWidget *lineNumbers;

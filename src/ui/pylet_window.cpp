@@ -10,6 +10,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qsplitter.h>
+#include <qdebug.h>
 
 PyletWindow::PyletWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -110,10 +111,33 @@ void PyletWindow::populateMenu()
     QAction* selectAll = new QAction("Select All", this); actions << selectAll;
     connect(selectAll, SIGNAL(triggered()), codeEditor, SLOT(selectAll()));
 
+    QAction* zoomIn = new QAction("Zoom In", this); actions << zoomIn;
+    connect(zoomIn, SIGNAL(triggered()), codeEditor, SLOT(zoomIn()));
+
+    QAction* zoomOut = new QAction("Zoom Out", this); actions << zoomOut;
+    connect(zoomOut, SIGNAL(triggered()), codeEditor, SLOT(zoomOut()));
+
+    QAction *resetZoom = new QAction("Reset Zoom", this); actions << resetZoom;
+    connect(resetZoom, SIGNAL(triggered()), codeEditor, SLOT(resetZoom()));
+
     for (int i = 0; i < actions.size(); ++i)
     {
         QAction *a = actions.at(i);
-        a->setShortcut(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
+        if (s->value("Shortcuts/" + a->text() + " Alt").isValid())
+        {
+            QList<QKeySequence> keylist;
+            keylist.append(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
+            keylist.append(QKeySequence(s->value("Shortcuts/" + a->text() + " Alt").toString()));
+            if (s->value("Shortcuts/" + a->text() + " Alt2").isValid())
+            {
+                keylist.append(QKeySequence(s->value("Shortcuts/" + a->text() + " Alt2").toString()));
+            }
+            a->setShortcuts(keylist);
+        }
+        else
+        {
+            a->setShortcut(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
+        }
     }
 
     QMenu *fileMenu = menuBar()->addMenu("File");
@@ -128,6 +152,10 @@ void PyletWindow::populateMenu()
     QMenu *searchMenu = menuBar()->addMenu("Search");
     QMenu *runMenu = menuBar()->addMenu("Run");
     QMenu *viewMenu = menuBar()->addMenu("View");
+        QMenu *zoomMenu = viewMenu->addMenu("Zoom");
+            zoomMenu->addAction(zoomIn);
+            zoomMenu->addAction(zoomOut);
+            zoomMenu->addAction(resetZoom);
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     QMenu *helpMenu = menuBar()->addMenu("Help");
 }
