@@ -13,16 +13,16 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
     QSyntaxHighlighter(parent)
 {
     QMap<QString, QTextCharFormat> styles;
-    styles["keyword"] = createFormat(Qt::blue);
-    styles["function"] = createFormat(Qt::red);
-    styles["operator"] = createFormat(Qt::red);
-    styles["brace"] = createFormat(Qt::darkGray);
-    styles["defclass"] = createFormat(Qt::black, "bold");
-    styles["string"] = createFormat(Qt::magenta);
-    styles["string2"] = createFormat(Qt::darkMagenta);
-    styles["comment"] = createFormat(Qt::darkGreen, "italic");
-    styles["self"] = createFormat(Qt::black, "italic");
-    styles["numbers"] = createFormat(Qt::red);
+    styles["keyword"] = createFormat(QBrush("#FF7700"));
+    styles["function"] = createFormat(QBrush("#900090"));
+    styles["operator"] = createFormat(QBrush("#000000"));
+    styles["brace"] = createFormat(QBrush("#000000"));
+    styles["defclass"] = createFormat(QBrush("#0000FF"));
+    styles["string"] = createFormat(QBrush("#00AA00"));
+    styles["comment"] = createFormat(QBrush("#DD0000"));
+    styles["comment2"] = createFormat(QBrush("#00AA00"));
+    styles["self"] = createFormat(QBrush("#000000"));
+    styles["numbers"] = createFormat(QBrush("#000000"));
 
     QList<QString> keywords;
     keywords 
@@ -106,8 +106,8 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
         << std::make_tuple(QRegExp("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b"), 0, styles["numbers"])
         << std::make_tuple(QRegExp("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b"), 0, styles["numbers"]);
 
-    tri_single = std::make_tuple(QRegExp("'''"), 1, styles["comment"]);
-    tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["comment"]);
+    tri_single = std::make_tuple(QRegExp("'''"), 1, styles["comment2"]);
+    tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["comment2"]);
 }
 
 void PythonHighlighter::highlightBlock(const QString &text)
