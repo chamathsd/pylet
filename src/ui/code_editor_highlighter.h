@@ -25,6 +25,9 @@ protected:
 
 private:
     QList<std::tuple<QRegExp, int, QTextCharFormat>> rules;
+    std::tuple<QRegExp, int, QTextCharFormat> tri_single, tri_double;
+
+    bool matchMultiline(const QString &text, const std::tuple<QRegExp, int, QTextCharFormat> &multiRule);
     QTextCharFormat createFormat(const QBrush &brush, const QString &style = "");
 };
 

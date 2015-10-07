@@ -86,6 +86,9 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
         << std::make_tuple(QRegExp("\\b[+-]?[0-9]+[lL]?\\b"), 0, styles["numbers"])
         << std::make_tuple(QRegExp("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b"), 0, styles["numbers"])
         << std::make_tuple(QRegExp("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b"), 0, styles["numbers"]);
+
+    tri_single = std::make_tuple(QRegExp("'''"), 1, styles["string2"]);
+    tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["string2"]);
 }
 
 void PythonHighlighter::highlightBlock(const QString &text)
@@ -106,6 +109,61 @@ void PythonHighlighter::highlightBlock(const QString &text)
     }
 
     setCurrentBlockState(0);
+
+    /* Multi-line strings */
+    bool inMultiline = matchMultiline(text, tri_single);
+    if (!inMultiline)
+    {
+        inMultiline = matchMultiline(text, tri_double);
+    }
+
+}
+
+bool PythonHighlighter::matchMultiline(const QString &text, const std::tuple<QRegExp, int, QTextCharFormat> &multiRule)
+{
+    QRegExp delimiter = std::get<0>(multiRule);
+    int in_state = std::get<1>(multiRule);
+    QTextCharFormat style = std::get<2>(multiRule);
+    int start, add, end, length;
+
+    if (previousBlockState() == in_state)
+    {
+        start = 0;
+        add = 0;
+    }
+    else
+    {
+        start = delimiter.indexIn(text);
+        add = delimiter.matchedLength();
+    }
+
+    while (start >= 0)
+    {
+        end = delimiter.indexIn(text, start + add);
+
+        if (end >= add)
+        {
+            length = end - start + add + delimiter.matchedLength();
+            setCurrentBlockState(0);
+        }
+        else
+        {
+            setCurrentBlockState(in_state);
+            length = text.length() - start + add;
+        }
+
+        setFormat(start, length, style);
+        start = delimiter.indexIn(text, start + length);
+    }
+
+    if (currentBlockState() == in_state)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 QTextCharFormat PythonHighlighter::createFormat(const QBrush &brush, const QString &style)
