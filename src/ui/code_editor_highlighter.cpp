@@ -98,13 +98,13 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
         // 'class' followed by identifier
         << std::make_tuple(QRegExp("\\bclass\\b\\s*(\\w+)"), 1, styles["defclass"])
 
-        // Space between '#" and newline
-        << std::make_tuple(QRegExp("#[^\\n]*"), 0, styles["comment"])
-
         // Numeric literals
         << std::make_tuple(QRegExp("\\b[+-]?[0-9]+[lL]?\\b"), 0, styles["numbers"])
         << std::make_tuple(QRegExp("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b"), 0, styles["numbers"])
-        << std::make_tuple(QRegExp("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b"), 0, styles["numbers"]);
+        << std::make_tuple(QRegExp("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b"), 0, styles["numbers"])
+
+        // Space between '#" and newline
+        << std::make_tuple(QRegExp("#[^\\n]*"), 0, styles["comment"]);
 
     tri_single = std::make_tuple(QRegExp("'''"), 1, styles["comment2"]);
     tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["comment2"]);
