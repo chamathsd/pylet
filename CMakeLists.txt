@@ -21,6 +21,8 @@ set(SOURCE
     src/ui/code_editor_interface.cpp
     src/ui/code_editor_interface.h
     src/ui/code_editor_numbers.h 
+    src/ui/code_editor_highlighter.cpp
+    src/ui/code_editor_highlighter.h
 )
 
 # set(RESOURCES)
