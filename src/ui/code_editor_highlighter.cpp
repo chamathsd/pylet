@@ -14,6 +14,7 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
 {
     QMap<QString, QTextCharFormat> styles;
     styles["keyword"] = createFormat(Qt::blue);
+    styles["function"] = createFormat(Qt::red);
     styles["operator"] = createFormat(Qt::red);
     styles["brace"] = createFormat(Qt::darkGray);
     styles["defclass"] = createFormat(Qt::black, "bold");
@@ -21,7 +22,7 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
     styles["string2"] = createFormat(Qt::darkMagenta);
     styles["comment"] = createFormat(Qt::darkGreen, "italic");
     styles["self"] = createFormat(Qt::black, "italic");
-    styles["numbers"] = createFormat(Qt::darkCyan);
+    styles["numbers"] = createFormat(Qt::red);
 
     QList<QString> keywords;
     keywords 
@@ -30,6 +31,20 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
         << "from" << "global" << "if" << "import" << "in" << "is" << "lambda"
         << "not" << "or" << "pass" << "print" << "raise" << "return" << "try"
         << "while" << "yield" << "None" << "True" << "False";
+
+    QList<QString> functions;
+    functions
+        << "abs" << "all" << "any" << "ascii" << "bin" << "bool" << "bytearray"
+        << "bytes" << "callable" << "chr" << "classmethod" << "compile"
+        << "complex" << "delattr" << "dict" << "dir" << "divmod" << "enumerate"
+        << "eval" << "exec" << "filter" << "float" << "format" << "frozenset"
+        << "getattr" << "globals" << "hasattr" << "hash" << "help" << "hex"
+        << "id" << "input" << "int" << "isinstance" << "issubclass" << "iter"
+        << "len" << "list" << "locals" << "map" << "max" << "memoryview" << "min"
+        << "next" << "object" << "oct" << "open" << "ord" << "pow" << "print"
+        << "property" << "range" << "repr" << "reversed" << "round" << "set"
+        << "setattr" << "slice" << "sorted" << "staticmethod" << "str" << "sum"
+        << "super" << "tuple" << "type" << "vars" << "zip" << "__import__";
 
     QList<QString> operators;
     operators
@@ -52,6 +67,10 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
     for (int i = 0; i < keywords.size(); ++i)
     {
         rules << std::make_tuple(QRegExp("\\b" + keywords.at(i) + "\\b"), 0, styles["keyword"]);
+    }
+    for (int i = 0; i < functions.size(); ++i)
+    {
+        rules << std::make_tuple(QRegExp("(^| )" + functions.at(i) + "\\("), 0, styles["function"]);
     }
     for (int i = 0; i < operators.size(); ++i)
     {
@@ -87,8 +106,8 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
         << std::make_tuple(QRegExp("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b"), 0, styles["numbers"])
         << std::make_tuple(QRegExp("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b"), 0, styles["numbers"]);
 
-    tri_single = std::make_tuple(QRegExp("'''"), 1, styles["string2"]);
-    tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["string2"]);
+    tri_single = std::make_tuple(QRegExp("'''"), 1, styles["comment"]);
+    tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["comment"]);
 }
 
 void PythonHighlighter::highlightBlock(const QString &text)
