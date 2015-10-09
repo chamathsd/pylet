@@ -13,6 +13,7 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
     QSyntaxHighlighter(parent)
 {
     QMap<QString, QTextCharFormat> styles;
+    styles["normal"] = createFormat(QBrush("#000000"));
     styles["keyword"] = createFormat(QBrush("#FF7700"));
     styles["function"] = createFormat(QBrush("#900090"));
     styles["operator"] = createFormat(QBrush("#000000"));
@@ -108,10 +109,15 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) :
 
     tri_single = std::make_tuple(QRegExp("'''"), 1, styles["comment2"]);
     tri_double = std::make_tuple(QRegExp("\"\"\""), 2, styles["comment2"]);
+
+    returnFormat = styles["keyword"];
+    normalFormat = styles["normal"];
 }
 
 void PythonHighlighter::highlightBlock(const QString &text)
 {
+    setFormat(0, text.length(), normalFormat);
+
     for (int i = 0; i < rules.size(); ++i)
     {
         QRegExp expression = std::get<0>(rules.at(i));

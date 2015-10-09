@@ -19,6 +19,8 @@ class PythonHighlighter : public QSyntaxHighlighter
 
 public:
     PythonHighlighter(QTextDocument *parent = 0);
+    QTextCharFormat returnFormat;
+    QTextCharFormat normalFormat;
 
 protected:
     void highlightBlock(const QString &text) Q_DECL_OVERRIDE;

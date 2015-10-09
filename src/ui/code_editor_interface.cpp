@@ -8,7 +8,6 @@
 
 #include "code_editor_interface.h"
 #include "code_editor_numbers.h"
-#include "code_editor_highlighter.h"
 #include <qcoreapplication.h>
 #include <qtextobject.h>
 #include <qpainter.h>
@@ -29,7 +28,7 @@ CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
     setTabStopWidth(tabSpacing * fontMetrics().width(' '));
     
     /* Syntax highlighter for Python documents */
-    PythonHighlighter *highlighter = new PythonHighlighter(this->document());
+    highlighter = new PythonHighlighter(this->document());
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumbersWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumbersArea(QRect, int)));
@@ -117,6 +116,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
     switch (event->key())
     {
         case Qt::Key_Tab:
+        {
             if (tabsEmitSpaces)
             {
                 event->accept();
@@ -127,9 +127,93 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
                 QPlainTextEdit::keyPressEvent(event);
             }
             break;
+        }
+        case Qt::Key_Return: case Qt::Key_Enter:
+        {
+            QString previousBlock = this->textCursor().block().text();
+            QString::const_iterator iter = previousBlock.begin();
+            bool validReturn = false;
+
+            QString whitespace;
+            while (iter != previousBlock.end())
+            {
+                const QChar &c = *iter;
+                if (c == ' ' || c == '\t')
+                {
+                    whitespace.append(c);
+                }
+                else
+                {
+                    break;
+                }
+                ++iter;
+            }
+
+            QString colonSearch;
+            QString returnSearch;
+
+            foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats())
+            {
+                if (r.format == highlighter->normalFormat)
+                {
+                    colonSearch.append(previousBlock.mid(r.start, r.length));
+                }
+                if (r.format == highlighter->returnFormat)
+                {
+                    returnSearch.append(previousBlock.mid(r.start, r.length));
+                }
+            }
+
+            if (colonSearch.contains(QRegExp(":")))
+            {
+                if (tabsEmitSpaces)
+                {
+                    whitespace += QString(tabSpacing, ' ');
+                }
+                else
+                {
+                    whitespace.append('\t');
+                }
+            }
+            else if (returnSearch.contains(QRegExp("return")))
+            {
+                unsigned int tabOver = 0;
+                foreach(QChar c, whitespace)
+                {
+                    if (c == ' ')
+                    {
+                        tabOver += 1;
+                    }
+                    else if (c == '\t')
+                    {
+                        tabOver += tabSpacing;
+                    }
+                }
+                tabOver /= tabSpacing;
+                if (tabOver > 0)
+                {
+                    tabOver -= 1;
+                }
+
+                if (tabsEmitSpaces)
+                {
+                    whitespace = QString(tabSpacing * tabOver, ' ');
+                }
+                else 
+                {
+                    whitespace = QString(tabOver, '\t');
+                }
+            }
+
+            QPlainTextEdit::keyPressEvent(event);
+            this->textCursor().insertText(whitespace);
+            break;
+        }
         default:
+        {
             QPlainTextEdit::keyPressEvent(event);
             break;
+        }
     }
 }
 

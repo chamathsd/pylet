@@ -9,6 +9,7 @@
 #ifndef CODE_EDITOR_INTERFACE_H
 #define CODE_EDITOR_INTERFACE_H
 
+#include "code_editor_highlighter.h"
 #include <qplaintextedit.h>
 #include <qsettings.h>
 
@@ -39,6 +40,7 @@ private slots:
 private:
     QWidget *lineNumbers;
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
+    PythonHighlighter* highlighter;
 };
 
 #endif // CODE_EDITOR_INTERFACE_H
