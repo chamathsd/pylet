@@ -13,8 +13,7 @@
 #include <qsyntaxhighlighter.h>
 #include <tuple>
 
-class PythonHighlighter : public QSyntaxHighlighter
-{
+class PythonHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:

@@ -10,8 +10,7 @@
 /* Entry point initialization - mostly runtime QSettings */
 static void g_initSettings(const QApplication &application);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     g_initSettings(app);
 
@@ -20,15 +19,13 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-static void g_initSettings(const QApplication &application)
-{
+static void g_initSettings(const QApplication &application) {
     QString configFile = "config.ini";
     QSettings config(configFile, QSettings::IniFormat);
 
     config.setPath(QSettings::IniFormat, QSettings::UserScope, application.applicationDirPath());
 
-    if (/* !QFile(configFile).exists() && */ config.isWritable())
-    {
+    if (/* !QFile(configFile).exists() && */ config.isWritable()) {
         config.beginGroup("Editor");
 
         config.setValue("iTabSpacing", 4);

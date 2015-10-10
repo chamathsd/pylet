@@ -12,24 +12,19 @@
 #include "code_editor_interface.h"
 #include <qwidget.h>
 
-class LineNumberWidget : public QWidget
-{
+class LineNumberWidget : public QWidget {
     Q_OBJECT
 
 public:
-    LineNumberWidget(CodeEditor *editor) : QWidget(editor) 
-    {
+    LineNumberWidget(CodeEditor *editor) : QWidget(editor) {
         codeEditor = editor;
     }
-
-    QSize sizeHint() const Q_DECL_OVERRIDE
-    {
+    QSize sizeHint() const Q_DECL_OVERRIDE {
         return QSize(codeEditor->lineNumbersWidth(), 0);
     }
 
 protected:
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE
-    {
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE {
         codeEditor->lineNumbersPaintEvent(event);
     }
 

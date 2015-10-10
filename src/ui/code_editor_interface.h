@@ -13,8 +13,7 @@
 #include <qplaintextedit.h>
 #include <qsettings.h>
 
-class CodeEditor : public QPlainTextEdit
-{
+class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
 
 public:

@@ -13,8 +13,7 @@
 #include <qpainter.h>
 #include <qdebug.h>
 
-CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
-{
+CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent) {
     lineNumbers = new LineNumberWidget(this);
 
     updateLineNumbersWidth(0);
@@ -35,12 +34,10 @@ CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 }
 
-int CodeEditor::lineNumbersWidth()
-{
+int CodeEditor::lineNumbersWidth() {
     int digits = 1;
     int max = qMax(1, blockCount());
-    while (max >= 10) 
-    {
+    while (max >= 10) {
         max /= 10;
         ++digits;
     }
@@ -50,30 +47,23 @@ int CodeEditor::lineNumbersWidth()
     return space + 30; /* width offset */
 }
 
-void CodeEditor::updateLineNumbersWidth(int /* newBlockCount */)
-{
+void CodeEditor::updateLineNumbersWidth(int /* newBlockCount */) {
     setViewportMargins(lineNumbersWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumbersArea(const QRect &rect, int dy)
-{
-    if (dy)
-    {
+void CodeEditor::updateLineNumbersArea(const QRect &rect, int dy){
+    if (dy) {
         lineNumbers->scroll(0, dy);
-    }
-    else
-    {
+    } else {
         lineNumbers->update(0, rect.y(), lineNumbers->width(), rect.height());
     }
-
-    if (rect.contains(viewport()->rect()))
-    {
+    
+    if (rect.contains(viewport()->rect())) {
         updateLineNumbersWidth(0);
     }
 }
 
-void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
-{
+void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event) {
     QPainter painter(lineNumbers);
     QRect lineNumberBG = event->rect();
     lineNumberBG.setWidth(lineNumberBG.width() - 8);
@@ -87,10 +77,8 @@ void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
     int top = (int)blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + (int)blockBoundingGeometry(block).height();
 
-    while (block.isValid() && top <= event->rect().bottom())
-    {
-        if (block.isVisible() && bottom >= event->rect().top())
-        {
+    while (block.isValid() && top <= event->rect().bottom()) {
+        if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::black);
             painter.drawText(-20, top, lineNumbers->width(), fontMetrics().height(), Qt::AlignRight, number);
@@ -103,51 +91,43 @@ void CodeEditor::lineNumbersPaintEvent(QPaintEvent *event)
     }
 }
 
-void CodeEditor::resizeEvent(QResizeEvent *event)
-{
+void CodeEditor::resizeEvent(QResizeEvent *event) {
     QPlainTextEdit::resizeEvent(event);
 
     QRect cr = contentsRect();
     lineNumbers->setGeometry(QRect(cr.left(), cr.top(), lineNumbersWidth(), cr.height()));
 }
 
-void CodeEditor::keyPressEvent(QKeyEvent *event)
-{
-    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && (event->modifiers() == Qt::ShiftModifier))
-    {
+void CodeEditor::keyPressEvent(QKeyEvent *event) {
+    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && (event->modifiers() == Qt::ShiftModifier)) {
         event->setModifiers(Qt::NoModifier);
     }
-    switch (event->key())
-    {
-        case Qt::Key_Tab:
-        {
-            if (tabsEmitSpaces)
-            {
+
+    switch (event->key()) {
+        /* Tab normally or emit user-defined spacing */
+        case Qt::Key_Tab: {
+            if (tabsEmitSpaces) {
                 event->accept();
                 this->textCursor().insertText(QString(tabSpacing, ' '));
             }
-            else
-            {
+            else {
                 QPlainTextEdit::keyPressEvent(event);
             }
             break;
         }
-        case Qt::Key_Return: case Qt::Key_Enter:
-        {
+
+        /* Check for colons / return keywords to handle indentation on next line */
+        case Qt::Key_Return: case Qt::Key_Enter: {
             QString previousBlock = this->textCursor().block().text();
             QString::const_iterator iter = previousBlock.begin();
             bool validReturn = false;
 
             QString whitespace;
-            while (iter != previousBlock.end())
-            {
+            while (iter != previousBlock.end()) {
                 const QChar &c = *iter;
-                if (c == ' ' || c == '\t')
-                {
+                if (c == ' ' || c == '\t') {
                     whitespace.append(c);
-                }
-                else
-                {
+                } else {
                     break;
                 }
                 ++iter;
@@ -156,55 +136,39 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
             QString colonSearch;
             QString returnSearch;
 
-            foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats())
-            {
-                if (r.format == highlighter->normalFormat)
-                {
+            foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats()) {
+                if (r.format == highlighter->normalFormat) {
                     colonSearch.append(previousBlock.mid(r.start, r.length));
-                }
-                if (r.format == highlighter->returnFormat)
-                {
+                } 
+                if (r.format == highlighter->returnFormat) {
                     returnSearch.append(previousBlock.mid(r.start, r.length));
                 }
             }
 
-            if (colonSearch.contains(QRegExp(":")))
-            {
-                if (tabsEmitSpaces)
-                {
+            if (colonSearch.contains(QRegExp(":"))) {
+                if (tabsEmitSpaces) {
                     whitespace += QString(tabSpacing, ' ');
-                }
-                else
-                {
+                } else {
                     whitespace.append('\t');
                 }
             }
-            else if (returnSearch.contains(QRegExp("return")))
-            {
+            if (returnSearch.contains(QRegExp("return"))) {
                 unsigned int tabOver = 0;
-                foreach(QChar c, whitespace)
-                {
-                    if (c == ' ')
-                    {
+                foreach(QChar c, whitespace) {
+                    if (c == ' ') {
                         tabOver += 1;
-                    }
-                    else if (c == '\t')
-                    {
+                    } else if (c == '\t') {
                         tabOver += tabSpacing;
                     }
                 }
                 tabOver /= tabSpacing;
-                if (tabOver > 0)
-                {
+                if (tabOver > 0) {
                     tabOver -= 1;
                 }
 
-                if (tabsEmitSpaces)
-                {
+                if (tabsEmitSpaces) {
                     whitespace = QString(tabSpacing * tabOver, ' ');
-                }
-                else 
-                {
+                } else {
                     whitespace = QString(tabOver, '\t');
                 }
             }
@@ -213,20 +177,17 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
             this->textCursor().insertText(whitespace);
             break;
         }
-        default:
-        {
+        default: {
             QPlainTextEdit::keyPressEvent(event);
             break;
         }
     }
 }
 
-void CodeEditor::highlightCurrentLine()
-{
+void CodeEditor::highlightCurrentLine() {
     QList<QTextEdit::ExtraSelection> extraSelection;
 
-    if (!isReadOnly())
-    {
+    if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
         QColor lineColor = QColor(Qt::blue).lighter(190);
@@ -241,18 +202,15 @@ void CodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelection);
 }
 
-void CodeEditor::zoomInSlot()
-{
+void CodeEditor::zoomInSlot() {
     this->zoomIn(2);
 }
 
-void CodeEditor::zoomOutSlot()
-{
+void CodeEditor::zoomOutSlot() {
     this->zoomOut(2);
 }
 
-void CodeEditor::resetZoom()
-{
+void CodeEditor::resetZoom() {
     QFont f = font();
     f.setPointSize(12);
     setFont(f);

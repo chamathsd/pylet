@@ -13,8 +13,8 @@
 #include <qdebug.h>
 
 PyletWindow::PyletWindow(QWidget *parent) :
-    QMainWindow(parent)
-{
+    QMainWindow(parent) {
+
     QDesktopWidget *desktop = QApplication::desktop();
     screenRect = desktop->screen()->rect();
 
@@ -25,15 +25,13 @@ PyletWindow::PyletWindow(QWidget *parent) :
     showMaximized();
 }
 
-PyletWindow::~PyletWindow()
-{
+PyletWindow::~PyletWindow() {
     /* Clean up QSettings that were passed around. */
     delete s;
 }
 
 
-void PyletWindow::initWindow()
-{
+void PyletWindow::initWindow() {
     setMinimumSize(600, 400);
     int screenWidth = screenRect.width();
     int screenHeight = screenRect.height();
@@ -42,8 +40,7 @@ void PyletWindow::initWindow()
     setWindowTitle("Pylet (Editor)"); 
 }
 
-void PyletWindow::initWidgets()
-{
+void PyletWindow::initWidgets() {
     QSplitter* coreWidget = new QSplitter(Qt::Horizontal);
     setCentralWidget(coreWidget);
 
@@ -89,8 +86,7 @@ void PyletWindow::initWidgets()
     statusBar();
 }
 
-void PyletWindow::populateMenu()
-{
+void PyletWindow::populateMenu() {
     QList<QAction*> actions;
 
     QAction* undo = new QAction("Undo", this); actions << undo;
@@ -120,22 +116,17 @@ void PyletWindow::populateMenu()
     QAction *resetZoom = new QAction("Reset Zoom", this); actions << resetZoom;
     connect(resetZoom, SIGNAL(triggered()), codeEditor, SLOT(resetZoom()));
 
-    for (int i = 0; i < actions.size(); ++i)
-    {
+    for (int i = 0; i < actions.size(); ++i) {
         QAction *a = actions.at(i);
-        if (s->value("Shortcuts/" + a->text() + " Alt").isValid())
-        {
+        if (s->value("Shortcuts/" + a->text() + " Alt").isValid()) {
             QList<QKeySequence> keylist;
             keylist.append(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
             keylist.append(QKeySequence(s->value("Shortcuts/" + a->text() + " Alt").toString()));
-            if (s->value("Shortcuts/" + a->text() + " Alt2").isValid())
-            {
+            if (s->value("Shortcuts/" + a->text() + " Alt2").isValid()) {
                 keylist.append(QKeySequence(s->value("Shortcuts/" + a->text() + " Alt2").toString()));
             }
             a->setShortcuts(keylist);
-        }
-        else
-        {
+        } else {
             a->setShortcut(QKeySequence(s->value("Shortcuts/" + a->text()).toString()));
         }
     }

@@ -11,8 +11,7 @@
 #include <qsettings.h>
 #include <qevent.h>
 
-class PyletWindow : public QMainWindow
-{
+class PyletWindow : public QMainWindow {
     Q_OBJECT
 
 public:
