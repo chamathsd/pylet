@@ -113,6 +113,10 @@ void CodeEditor::resizeEvent(QResizeEvent *event)
 
 void CodeEditor::keyPressEvent(QKeyEvent *event)
 {
+    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && (event->modifiers() == Qt::ShiftModifier))
+    {
+        event->setModifiers(Qt::NoModifier);
+    }
     switch (event->key())
     {
         case Qt::Key_Tab:
