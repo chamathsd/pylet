@@ -12,6 +12,7 @@
 #include <qtextobject.h>
 #include <qpainter.h>
 #include <qdebug.h>
+#include <limits>
 
 CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent) {
     lineNumbers = new LineNumberWidget(this);
@@ -19,13 +20,18 @@ CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent) {
     updateLineNumbersWidth(0);
     highlightCurrentLine();
 
-    tabSpacing = s->value("Editor/iTabSpacing").toInt();
-    tabsEmitSpaces = s->value("Editor/bTabsEmitSpaces").toBool();
+    tabSpacing = s->value("Editor/iTabSpacing", 4).toInt();
+    tabsEmitSpaces = s->value("Editor/bTabsEmitSpaces", true).toBool();
+
+    /* Safety check on user-defined values */
+    if (tabSpacing < 0) {
+        tabSpacing = 4;
+    }
 
     setFont(monoFont);
     setWordWrapMode(QTextOption::NoWrap);
     setTabStopWidth(tabSpacing * fontMetrics().width(' '));
-    
+
     /* Syntax highlighter for Python documents */
     highlighter = new PythonHighlighter(this->document());
 
@@ -51,13 +57,13 @@ void CodeEditor::updateLineNumbersWidth(int /* newBlockCount */) {
     setViewportMargins(lineNumbersWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumbersArea(const QRect &rect, int dy){
+void CodeEditor::updateLineNumbersArea(const QRect &rect, int dy) {
     if (dy) {
         lineNumbers->scroll(0, dy);
     } else {
         lineNumbers->update(0, rect.y(), lineNumbers->width(), rect.height());
     }
-    
+
     if (rect.contains(viewport()->rect())) {
         updateLineNumbersWidth(0);
     }
@@ -109,28 +115,26 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
             if (tabsEmitSpaces) {
                 event->accept();
                 this->textCursor().insertText(QString(tabSpacing, ' '));
-            }
-            else {
+            } else {
                 QPlainTextEdit::keyPressEvent(event);
             }
             break;
         }
 
-        /* Check for colons / return keywords to handle indentation on next line */
+        /* Check line for colons and return keyword to handle indentation on next line*/
         case Qt::Key_Return: case Qt::Key_Enter: {
-            QString previousBlock = this->textCursor().block().text();
-            QString::const_iterator iter = previousBlock.begin();
-            bool validReturn = false;
+            QString currentBlock = this->textCursor().block().text();
+            QString::const_iterator iter = currentBlock.begin();
 
             QString whitespace;
-            while (iter != previousBlock.end()) {
+            while (iter != currentBlock.end()) {
                 const QChar &c = *iter;
                 if (c == ' ' || c == '\t') {
                     whitespace.append(c);
+                    ++iter;
                 } else {
                     break;
                 }
-                ++iter;
             }
 
             QString colonSearch;
@@ -138,10 +142,10 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
 
             foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats()) {
                 if (r.format == highlighter->normalFormat) {
-                    colonSearch.append(previousBlock.mid(r.start, r.length));
-                } 
+                    colonSearch.append(currentBlock.mid(r.start, r.length));
+                }
                 if (r.format == highlighter->returnFormat) {
-                    returnSearch.append(previousBlock.mid(r.start, r.length));
+                    returnSearch.append(currentBlock.mid(r.start, r.length));
                 }
             }
 
@@ -151,13 +155,13 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
                 } else {
                     whitespace.append('\t');
                 }
-            }
-            if (returnSearch.contains(QRegExp("return"))) {
+            } else if (returnSearch.contains(QRegExp("return"))) {
                 unsigned int tabOver = 0;
                 foreach(QChar c, whitespace) {
                     if (c == ' ') {
                         tabOver += 1;
-                    } else if (c == '\t') {
+                    }
+                    if (c == '\t') {
                         tabOver += tabSpacing;
                     }
                 }
@@ -175,8 +179,41 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
 
             QPlainTextEdit::keyPressEvent(event);
             this->textCursor().insertText(whitespace);
+            
             break;
         }
+
+        /* Compare whitespace before cursor to tabSpacing for auto tab-decrement on backspace */
+        case Qt::Key_Backspace: {
+            QString currentBlock = this->textCursor().block().text();
+            int cursorPos = this->textCursor().positionInBlock();
+            if (cursorPos > 0) {
+                QChar previousChar = currentBlock[cursorPos - 1];
+                if (previousChar == ' ') {
+                    currentBlock = currentBlock.left(cursorPos);
+                    int decrementRange = currentBlock.length() % tabSpacing;
+                    if (decrementRange == 0) {
+                        decrementRange = tabSpacing;
+                    }
+                    QString::const_iterator iter = currentBlock.end() - 1;
+                    for (int i = 0; i < decrementRange; ++i) {
+                        const QChar &c = *iter;
+                        if (c == ' ') {
+                            this->textCursor().deletePreviousChar();
+                            --iter;
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    QPlainTextEdit::keyPressEvent(event);
+                }
+            } else {
+                QPlainTextEdit::keyPressEvent(event);
+            }
+            break;
+        }
+
         default: {
             QPlainTextEdit::keyPressEvent(event);
             break;
