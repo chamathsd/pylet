@@ -11,8 +11,6 @@
 #include <qcoreapplication.h>
 #include <qtextobject.h>
 #include <qpainter.h>
-#include <qdebug.h>
-#include <limits>
 
 CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent) {
     lineNumbers = new LineNumberWidget(this);
@@ -139,6 +137,10 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
 
             QString colonSearch;
             QString returnSearch;
+
+            /* TODO: Handle edge cases where cursor is before colon or return keyword 
+             *       Handle paranthetical parameter indentation.
+             */
 
             foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats()) {
                 if (r.format == highlighter->normalFormat) {
