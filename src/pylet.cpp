@@ -13,6 +13,7 @@ static void g_initSettings(const QApplication &application);
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     g_initSettings(app);
+    app.setCursorFlashTime(800);
 
     PyletWindow w;
 
