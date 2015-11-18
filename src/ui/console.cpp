@@ -2,7 +2,7 @@
 * Copyright (c) 2015 Jake Schadaway.
 * Licensed under the MIT License. See LICENSE.md for details.
 *
-* Special thanks to Mateusz Loskot for the 
+* Special thanks to Mateusz Loskot for the custom buffer implementation.
 */
 
 #include "console.h"
