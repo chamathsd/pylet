@@ -46,7 +46,7 @@ set(SOURCE
 set(GUI_TYPE "")
 
 if(WIN32)
-    #set(GUI_TYPE WIN32)
+    set(GUI_TYPE WIN32)
 elseif(UNIX)
     if(APPLE)
         set(GUI_TYPE MACOSX_BUNDLE)
