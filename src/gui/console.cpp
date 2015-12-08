@@ -7,13 +7,23 @@
 #include "src/python/buffer.h"
 
 Console::Console(QWidget *parent) : QPlainTextEdit(parent) {
-    // QString s = QString::fromStdString(parsePyFile());
-    // this->textCursor().insertText(s);
+    setFont(monoFont);
+    setWordWrapMode(QTextOption::WrapAnywhere);
 }
 
 void Console::runFile(const QString &filename) {
+    moveCursor(QTextCursor::End);
+    textCursor().insertText(generateRestartString());
     std::string pyFile = filename.toStdString();
     QString readOut = QString::fromStdString(parsePyFile(pyFile));
-    this->textCursor().insertText(readOut);
-    this->ensureCursorVisible();
+    textCursor().insertText(readOut);
+    ensureCursorVisible();
+    
+}
+
+QString Console::generateRestartString() {
+    int fontWidth = fontMetrics().width('=');
+    QString spacer(((width() - 140) / fontWidth) / 2, '=');
+    QString restartString = "\n" + spacer + " RESTART " + spacer + "\n";
+    return restartString;
 }
