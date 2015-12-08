@@ -25,4 +25,6 @@ namespace emb {
 
 }
 
+std::string parsePyFile(const std::string &filename);
+
 #endif // BUFFER_H

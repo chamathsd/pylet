@@ -13,6 +13,7 @@ class Console : public QPlainTextEdit {
 
 public:
     Console(QWidget *parent = 0);
+    void runFile(const QString &filename);
 };
 
 #endif // CONSOLE_H

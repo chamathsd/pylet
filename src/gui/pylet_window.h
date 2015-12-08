@@ -7,6 +7,7 @@
 #define PYLET_WINDOW_H
 
 #include "code_editor_interface.h"
+#include "console.h"
 #include <qmainwindow.h>
 #include <qsettings.h>
 #include <qevent.h>
@@ -23,8 +24,12 @@ private:
     void initWidgets();
     void populateMenu();
     CodeEditor *codeEditor;
+    Console *console;
     QSettings *s;
     QRect screenRect;
+
+private slots:
+    void run();
 };
 
 #endif // PYLET_WINDOW_H

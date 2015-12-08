@@ -4,14 +4,15 @@
 */
 
 #include "pylet_window.h"
-#include "console.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
+#include <qtemporaryfile.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qsplitter.h>
 #include <qdebug.h>
+#include <qdir.h>
 
 PyletWindow::PyletWindow(QWidget *parent) :
     QMainWindow(parent) {
@@ -74,7 +75,7 @@ void PyletWindow::initWidgets() {
     // shell->setAlignment(Qt::AlignCenter);
     // shell->setText("Shell / Tracer");
     // shell->setMinimumWidth(280);
-    Console* console = new Console(coreWidget);
+    console = new Console(coreWidget);
     console->setMinimumWidth(280);
     coreWidget->insertWidget(2, console);
 
@@ -87,6 +88,18 @@ void PyletWindow::initWidgets() {
     populateMenu();
     addToolBar("Action Bar");
     statusBar();
+}
+
+void PyletWindow::run() {
+    QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", this->codeEditor);
+
+    tempFile.open();
+    QTextStream out(&tempFile);
+    out << this->codeEditor->toPlainText() << endl;
+    tempFile.close();
+
+    console->runFile(tempFile.fileName());
+    tempFile.remove();
 }
 
 void PyletWindow::populateMenu() {
@@ -109,6 +122,9 @@ void PyletWindow::populateMenu() {
 
     QAction* selectAll = new QAction("Select All", this); actions << selectAll;
     connect(selectAll, SIGNAL(triggered()), codeEditor, SLOT(selectAll()));
+
+    QAction* run = new QAction("Run", this); actions << run;
+    connect(run, SIGNAL(triggered()), this, SLOT(run()));
 
     QAction* zoomIn = new QAction("Zoom In", this); actions << zoomIn;
     connect(zoomIn, SIGNAL(triggered()), codeEditor, SLOT(zoomIn()));
@@ -145,6 +161,7 @@ void PyletWindow::populateMenu() {
         editMenu->addAction(selectAll);
     QMenu *searchMenu = menuBar()->addMenu("Search");
     QMenu *runMenu = menuBar()->addMenu("Run");
+        runMenu->addAction(run);
     QMenu *viewMenu = menuBar()->addMenu("View");
         QMenu *zoomMenu = viewMenu->addMenu("Zoom");
             zoomMenu->addAction(zoomIn);

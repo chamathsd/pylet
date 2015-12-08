@@ -133,3 +133,31 @@ namespace emb {
     }
 
 } // namespace emb
+
+std::string parsePyFile(const std::string &filename) {
+    using namespace boost::python;
+
+    PyImport_AppendInittab("emb", emb::PyInit_emb);
+    Py_Initialize();
+    PyImport_ImportModule("emb");
+
+    // here comes the ***magic***
+    std::string buffer;
+    {
+        // switch sys.stdout to custom handler
+        emb::stdout_write_type write =
+            [&buffer](std::string s) { buffer += s; };
+
+        emb::set_stdout(write);
+        FILE* file = _Py_fopen(filename.c_str(), "r+");
+        if (file != NULL) {
+            PyRun_SimpleFileEx(file, filename.c_str(), 1);
+        }
+        emb::reset_stdout();
+    }
+    Py_Finalize();
+
+    // std::clog << buffer << std::endl;
+
+    return buffer;
+}

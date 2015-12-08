@@ -41,6 +41,7 @@ static void g_initSettings(const QApplication &application) {
         config.setValue("Copy", QKeySequence(Qt::CTRL + Qt::Key_C));
         config.setValue("Paste", QKeySequence(Qt::CTRL + Qt::Key_V));
         config.setValue("Select All", QKeySequence(Qt::CTRL + Qt::Key_A));
+        config.setValue("Run", QKeySequence(Qt::CTRL + Qt::Key_R));
         config.setValue("Zoom In", QKeySequence(Qt::CTRL + Qt::Key_Plus));
         config.setValue("Zoom In Alt", QKeySequence(Qt::CTRL + Qt::KeypadModifier + Qt::Key_Plus));
         config.setValue("Zoom In Alt2", QKeySequence(Qt::CTRL + Qt::Key_Equal));
