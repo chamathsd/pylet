@@ -4,6 +4,7 @@
 */
 
 #include "pylet_window.h"
+#include "console.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qmenubar.h>
@@ -68,12 +69,14 @@ void PyletWindow::initWidgets() {
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 
-    QLabel* shell = new QLabel(coreWidget);
-    shell->setStyleSheet("background-color: orange; color: white; font-size: 40px;");
-    shell->setAlignment(Qt::AlignCenter);
-    shell->setText("Shell / Tracer");
-    shell->setMinimumWidth(280);
-    coreWidget->insertWidget(2, shell);
+    // QLabel* shell = new QLabel(coreWidget);
+    // shell->setStyleSheet("background-color: orange; color: white; font-size: 40px;");
+    // shell->setAlignment(Qt::AlignCenter);
+    // shell->setText("Shell / Tracer");
+    // shell->setMinimumWidth(280);
+    Console* console = new Console(coreWidget);
+    console->setMinimumWidth(280);
+    coreWidget->insertWidget(2, console);
 
     coreWidget->setStretchFactor(0, 1);
     coreWidget->setStretchFactor(1, 5);

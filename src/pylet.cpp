@@ -3,7 +3,7 @@
 * Licensed under the MIT License. See LICENSE.md for details.
 */
 
-#include "ui/pylet_window.h"
+#include "gui/pylet_window.h"
 #include <qapplication.h>
 #include <qsettings.h>
 

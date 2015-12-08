@@ -14,15 +14,31 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-set(SOURCE
+set(CORE_SOURCE
     src/pylet.cpp
-    src/ui/pylet_window.cpp
-    src/ui/pylet_window.h
-    src/ui/code_editor_interface.cpp
-    src/ui/code_editor_interface.h
-    src/ui/code_editor_numbers.h 
-    src/ui/code_editor_highlighter.cpp
-    src/ui/code_editor_highlighter.h
+)
+
+set(GUI_SOURCE
+    src/gui/pylet_window.cpp
+    src/gui/pylet_window.h
+    src/gui/code_editor_interface.cpp
+    src/gui/code_editor_interface.h
+    src/gui/code_editor_numbers.h 
+    src/gui/code_editor_highlighter.cpp
+    src/gui/code_editor_highlighter.h
+    src/gui/console.cpp
+    src/gui/console.h
+)
+
+set(PYTHON_SOURCE
+    src/python/buffer.cpp
+    src/python/buffer.h
+)
+
+set(SOURCE
+    ${CORE_SOURCE}
+    ${GUI_SOURCE}
+    ${PYTHON_SOURCE}
 )
 
 # set(RESOURCES)
@@ -40,9 +56,15 @@ else()
     MESSAGE(FATAL_ERROR "Target OS not recognized or supported, aborting CMake process.")
 endif()
 
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+
+find_package(PythonLibs REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
+find_package(Boost COMPONENTS python REQUIRED)
 
 # qt5_add_resources(UI_RESOURCES ${RESOURCES})
 
@@ -52,6 +74,11 @@ include_directories(
     ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
+    ${PYTHON_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+)
+link_directories(
+    ${Boost_LIBRARY_DIRS}
 )
 add_executable(pylet
     ${GUI_TYPE}
@@ -62,10 +89,13 @@ target_link_libraries(pylet
     Qt5::Widgets
     Qt5::Core
     Qt5::Gui
+    ${PYTHON_LIBRARIES}
+    ${Boost_LIBRARIES}
 )
 if(MSVC)
-    source_group("src" REGULAR_EXPRESSION "src/[^/.]*\.")
-    source_group("src\\ui" REGULAR_EXPRESSION "src/ui.*\.")
+    source_group("src\\" FILES ${CORE_SOURCE})
+    source_group("src\\gui" FILES ${GUI_SOURCE})
+    source_group("src\\python" FILES ${PYTHON_SOURCE})
 endif()
 
 # --- RUNTIME DEPENDENCIES ---

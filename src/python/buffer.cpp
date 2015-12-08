@@ -5,10 +5,7 @@
 * Special thanks to Mateusz Loskot for the custom buffer implementation.
 */
 
-#include "console.h"
-
-#include <boost/python.hpp>
-#include "Python.h"
+#include "buffer.h"
 
 #include <iostream>
 
@@ -136,34 +133,3 @@ namespace emb {
     }
 
 } // namespace emb
-
-std::string parsePyFunc() {
-    using namespace boost::python;
-
-    PyImport_AppendInittab("emb", emb::PyInit_emb);
-    Py_Initialize();
-    PyImport_ImportModule("emb");
-
-    // here comes the ***magic***
-    std::string buffer;
-    {
-        // switch sys.stdout to custom handler
-        emb::stdout_write_type write = [&buffer](std::string s) { buffer += s; };
-        emb::set_stdout(write);
-        FILE *file = fopen("pylet_exec", "w");
-        fprintf(file, "import readline\nimport code\nshell = code.InteractiveConsle()\nshell.interact()");
-        fclose(file);
-        PyRun_InteractiveLoop(file, "<PyletShell>");
-        emb::reset_stdout();
-    }
-    Py_Finalize();
-
-    std::cout << buffer << std::endl;
-
-    return buffer;
-}
-
-Console::Console(QWidget *parent) : QPlainTextEdit(parent) {
-    QString s = QString::fromStdString(parsePyFunc());
-    this->textCursor().insertText(s);
-}
