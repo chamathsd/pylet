@@ -150,8 +150,11 @@ std::string parsePyFile(const std::string &filename) {
             [&buffer](std::string s) { buffer += s; };
 
         emb::set_stdout(write);
-        
-        // PySys_SetObject("stderr", embModule);
+
+        // Temporary measure to redirect traceback to stdout buffer
+        // TODO: set up stderr collection in the emb module
+        PyRun_SimpleString("import sys");
+        PyRun_SimpleString("sys.stderr = sys.stdout");
 
         FILE* file = _Py_fopen(filename.c_str(), "r+");
         if (file != NULL) {
