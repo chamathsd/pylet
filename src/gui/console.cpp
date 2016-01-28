@@ -18,7 +18,6 @@ void Console::runFile(const QString &filename) {
     QString readOut = QString::fromStdString(parsePyFile(pyFile));
     textCursor().insertText(readOut);
     ensureCursorVisible();
-    
 }
 
 QString Console::generateRestartString() {

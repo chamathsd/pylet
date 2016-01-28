@@ -46,7 +46,7 @@ set(SOURCE
 set(GUI_TYPE "")
 
 if(WIN32)
-    set(GUI_TYPE WIN32)
+    # set(GUI_TYPE WIN32)
 elseif(UNIX)
     if(APPLE)
         set(GUI_TYPE MACOSX_BUNDLE)
@@ -60,7 +60,7 @@ set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)

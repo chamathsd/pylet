@@ -6,11 +6,16 @@
 #include "gui/pylet_window.h"
 #include <qapplication.h>
 #include <qsettings.h>
+#include <sstream>
+#include <iostream>
 
 /* Entry point initialization - mostly runtime QSettings */
 static void g_initSettings(const QApplication &application);
 
 int main(int argc, char *argv[]) {
+    std::stringstream stderrRedirect;
+    std::streambuf* old = std::cerr.rdbuf(stderrRedirect.rdbuf());
+
     QApplication app(argc, argv);
     g_initSettings(app);
     app.setCursorFlashTime(800);

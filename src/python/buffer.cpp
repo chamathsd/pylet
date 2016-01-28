@@ -8,6 +8,7 @@
 #include "buffer.h"
 
 #include <iostream>
+#include <sstream>
 
 namespace emb {
 
@@ -139,7 +140,7 @@ std::string parsePyFile(const std::string &filename) {
 
     PyImport_AppendInittab("emb", emb::PyInit_emb);
     Py_Initialize();
-    PyImport_ImportModule("emb");
+    PyObject* embModule = PyImport_ImportModule("emb");
 
     // here comes the ***magic***
     std::string buffer;
@@ -149,15 +150,15 @@ std::string parsePyFile(const std::string &filename) {
             [&buffer](std::string s) { buffer += s; };
 
         emb::set_stdout(write);
+        
+        // PySys_SetObject("stderr", embModule);
+
         FILE* file = _Py_fopen(filename.c_str(), "r+");
         if (file != NULL) {
             PyRun_SimpleFileEx(file, filename.c_str(), 1);
         }
-        emb::reset_stdout();
     }
     Py_Finalize();
-
-    // std::clog << buffer << std::endl;
 
     return buffer;
 }
