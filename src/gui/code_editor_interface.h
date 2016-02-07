@@ -1,6 +1,6 @@
 /*
-* Copyright (c) 2015 Jake Schadaway.
-* Licensed under the MIT License. See LICENSE.md for details.
+* Copyright (c) 2016 Jake Dharmasiri.
+* Licensed under the GNU GPLv3 License. See LICENSE.md for details.
 * 
 * Special thanks to Qt for their code editor reference,
 * from which the following code is forked.
