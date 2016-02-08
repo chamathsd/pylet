@@ -70,11 +70,6 @@ void PyletWindow::initWidgets() {
     codeEditor->setMinimumWidth(280);
     coreWidget->insertWidget(1, codeEditor);
 
-    // QLabel* shell = new QLabel(coreWidget);
-    // shell->setStyleSheet("background-color: orange; color: white; font-size: 40px;");
-    // shell->setAlignment(Qt::AlignCenter);
-    // shell->setText("Shell / Tracer");
-    // shell->setMinimumWidth(280);
     console = new Console(coreWidget);
     console->setMinimumWidth(280);
     coreWidget->insertWidget(2, console);
@@ -85,25 +80,8 @@ void PyletWindow::initWidgets() {
 
     coreWidget->setMidLineWidth(8);
 
-    populateMenu();
-    addToolBar("Action Bar");
-    statusBar();
-}
 
-void PyletWindow::run() {
-    QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", this->codeEditor);
-
-    tempFile.open();
-    QTextStream out(&tempFile);
-    out << this->codeEditor->toPlainText() << endl;
-    tempFile.close();
-
-    console->runFile(tempFile.fileName());
-    tempFile.remove();
-}
-
-void PyletWindow::populateMenu() {
-    QList<QAction*> actions;
+    /* Do action population and fill out menus correspondingly */
 
     QAction* undo = new QAction("Undo", this); actions << undo;
     connect(undo, SIGNAL(triggered()), codeEditor, SLOT(undo()));
@@ -150,6 +128,7 @@ void PyletWindow::populateMenu() {
         }
     }
 
+    /* QMenu population */
     QMenu *fileMenu = menuBar()->addMenu("File");
     QMenu *editMenu = menuBar()->addMenu("Edit");
         editMenu->addAction(undo);
@@ -169,4 +148,43 @@ void PyletWindow::populateMenu() {
             zoomMenu->addAction(resetZoom);
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     QMenu *helpMenu = menuBar()->addMenu("Help");
+
+    /* QToolBar population */
+    toolBar = addToolBar("Action Bar");
+    
+    QPixmap runIcon(":/pylet_icons/icons/run.png"),
+            cutIcon(":/pylet_icons/icons/cut.png"),
+            copyIcon(":/pylet_icons/icons/copy.png"),
+            pasteIcon(":/pylet_icons/icons/paste.png"),
+            undoIcon(":/pylet_icons/icons/undo.png"),
+            redoIcon(":/pylet_icons/icons/redo.png"),
+            zoomInIcon(":/pylet_icons/icons/zoom-in.png"),
+            zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
+            zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
+    toolBar->addAction(QIcon(runIcon), "Run File", this, SLOT(run()));
+    toolBar->addSeparator();
+    toolBar->addAction(QIcon(cutIcon), "Cut", codeEditor, SLOT(cut()));
+    toolBar->addAction(QIcon(copyIcon), "Copy", codeEditor, SLOT(copy()));
+    toolBar->addAction(QIcon(pasteIcon), "Paste", codeEditor, SLOT(paste()));
+    toolBar->addSeparator();
+    toolBar->addAction(QIcon(undoIcon), "Undo", codeEditor, SLOT(undo()));
+    toolBar->addAction(QIcon(redoIcon), "Redo", codeEditor, SLOT(redo()));
+    toolBar->addSeparator();
+    toolBar->addAction(QIcon(zoomInIcon), "Zoom In", codeEditor, SLOT(zoomIn()));
+    toolBar->addAction(QIcon(zoomOutIcon), "Zoom Out", codeEditor, SLOT(zoomOut()));
+    toolBar->addAction(QIcon(zoomResetIcon), "Reset Zoom", codeEditor, SLOT(resetZoom()));
+
+    statusBar();
+}
+
+void PyletWindow::run() {
+    QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", this->codeEditor);
+
+    tempFile.open();
+    QTextStream out(&tempFile);
+    out << this->codeEditor->toPlainText() << endl;
+    tempFile.close();
+
+    console->runFile(tempFile.fileName());
+    tempFile.remove();
 }

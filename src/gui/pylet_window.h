@@ -9,6 +9,7 @@
 #include "code_editor_interface.h"
 #include "console.h"
 #include <qmainwindow.h>
+#include <qtoolbar.h>
 #include <qsettings.h>
 #include <qevent.h>
 
@@ -22,9 +23,10 @@ public:
 private:
     void initWindow();
     void initWidgets();
-    void populateMenu();
     CodeEditor *codeEditor;
     Console *console;
+    QList<QAction*> actions;
+    QToolBar *toolBar;
     QSettings *s;
     QRect screenRect;
 
