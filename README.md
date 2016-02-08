@@ -8,6 +8,6 @@ Pylet can be built using [CMake](http://www.cmake.org/download/) alongisde the [
 
 ## License
 This project is licensed under the GNU GPLv3 License.
-The full license can be viewed [here](LICENSE.md).
+The full license can be viewed [here](LICENSE).
 
-This application makes use of the Snowish icon pack by [Alexander Moore](http://sa-ki.deviantart.com/). These 
+This application makes use of the Snowish icon pack by [Alexander Moore](http://sa-ki.deviantart.com/). Packaged icons are distributed under the terms of the GPLv3 license as described above.
