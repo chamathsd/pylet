@@ -41,7 +41,10 @@ set(SOURCE
     ${PYTHON_SOURCE}
 )
 
-# set(RESOURCES)
+set(RESOURCES
+    res/icons.qrc
+    res/fonts.qrc
+)
 
 set(GUI_TYPE "")
 
@@ -66,7 +69,7 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Boost COMPONENTS python REQUIRED)
 
-# qt5_add_resources(UI_RESOURCES ${RESOURCES})
+qt5_add_resources(UI_RESOURCES ${RESOURCES})
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -83,7 +86,7 @@ link_directories(
 add_executable(pylet
     ${GUI_TYPE}
     ${SOURCE}
-    # ${UI_RESOURCES}
+    ${UI_RESOURCES}
 )
 target_link_libraries(pylet
     Qt5::Widgets

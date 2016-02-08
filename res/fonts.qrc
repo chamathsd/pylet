@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/typeface">
+        <file alias="Montserrat-Black.ttf">fonts/motiva-sans-medium.ttf</file>
+    </qresource>
+</RCC>

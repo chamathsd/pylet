@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/pylet_icons">
+        <file>icons/close-all.png</file>
+        <file>icons/close-file.png</file>
+        <file>icons/copy.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/interrupt.png</file>
+        <file>icons/new-file.png</file>
+        <file>icons/open-file.png</file>
+        <file>icons/paste.png</file>
+        <file>icons/print.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/replace.png</file>
+        <file>icons/run.png</file>
+        <file>icons/save.png</file>
+        <file>icons/save-all.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/undo.png</file>
+		<file>icons/zoom-fit.png</file>
+		<file>icons/zoom-in.png</file>
+		<file>icons/zoom-out.png</file>
+    </qresource>
+</RCC>
