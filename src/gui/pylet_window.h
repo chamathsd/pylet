@@ -7,6 +7,7 @@
 #define PYLET_WINDOW_H
 
 #include "code_editor_interface.h"
+#include "editor_stack.h"
 #include "console.h"
 #include <qmainwindow.h>
 #include <qtoolbar.h>
@@ -24,6 +25,7 @@ private:
     void initWindow();
     void initWidgets();
     CodeEditor *codeEditor;
+    EditorStack *editorStack;
     Console *console;
     QList<QAction*> actions;
     QToolBar *toolBar;

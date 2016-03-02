@@ -4,7 +4,6 @@
 */
 
 #include "pylet_window.h"
-#include "editor_stack.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
@@ -67,7 +66,7 @@ void PyletWindow::initWidgets() {
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    EditorStack *editorStack = new EditorStack(coreWidget);
+    editorStack = new EditorStack(coreWidget);
     editorStack->setMinimumWidth(280);
     coreWidget->insertWidget(1, editorStack);
 
@@ -185,13 +184,17 @@ void PyletWindow::initWidgets() {
 }
 
 void PyletWindow::run() {
-    QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", this->codeEditor);
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(editorStack->currentWidget())) {
+        QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", c);
 
-    tempFile.open();
-    QTextStream out(&tempFile);
-    out << this->codeEditor->toPlainText() << endl;
-    tempFile.close();
+        tempFile.open();
+        QTextStream out(&tempFile);
+        out << c->toPlainText() << endl;
+        tempFile.close();
 
-    console->runFile(tempFile.fileName());
-    tempFile.remove();
+        console->runFile(tempFile.fileName());
+        tempFile.remove();
+    } else {
+        qDebug() << "No valid CodeEditor to run on editor stack - are any files open?";
+    }
 }
