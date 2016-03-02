@@ -32,6 +32,8 @@ private slots:
     void updateLineNumbersWidth(int newBlockCount);
     void updateLineNumbersArea(const QRect &, int);
     void highlightCurrentLine();
+
+public slots:
     void zoomInSlot();
     void zoomOutSlot();
     void resetZoom();

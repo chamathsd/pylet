@@ -26,6 +26,8 @@ set(GUI_SOURCE
     src/gui/code_editor_numbers.h 
     src/gui/code_editor_highlighter.cpp
     src/gui/code_editor_highlighter.h
+    src/gui/editor_stack.cpp
+    src/gui/editor_stack.h
     src/gui/console.cpp
     src/gui/console.h
 )

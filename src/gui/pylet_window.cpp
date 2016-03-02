@@ -4,6 +4,7 @@
 */
 
 #include "pylet_window.h"
+#include "editor_stack.h"
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
@@ -66,9 +67,15 @@ void PyletWindow::initWidgets() {
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    codeEditor = new CodeEditor(s, coreWidget);
-    codeEditor->setMinimumWidth(280);
-    coreWidget->insertWidget(1, codeEditor);
+    EditorStack *editorStack = new EditorStack(coreWidget);
+    editorStack->setMinimumWidth(280);
+    coreWidget->insertWidget(1, editorStack);
+
+    codeEditor = new CodeEditor(s, editorStack);
+    editorStack->addTab(codeEditor, "ps3pr1.py");
+    CodeEditor *codeEditor2 = new CodeEditor(s, editorStack);
+    editorStack->addTab(codeEditor2, "ps3pr2.py");
+    // codeEditor->setMinimumWidth(280);
 
     console = new Console(coreWidget);
     console->setMinimumWidth(280);
@@ -84,28 +91,28 @@ void PyletWindow::initWidgets() {
     /* Do action population and fill out menus correspondingly */
 
     QAction* undo = new QAction("Undo", this); actions << undo;
-    connect(undo, SIGNAL(triggered()), codeEditor, SLOT(undo()));
+    connect(undo, SIGNAL(triggered()), editorStack, SLOT(undo()));
 
     QAction* redo = new QAction("Redo", this); actions << redo;
-    connect(redo, SIGNAL(triggered()), codeEditor, SLOT(redo()));
+    connect(redo, SIGNAL(triggered()), editorStack, SLOT(redo()));
 
     QAction* cut = new QAction("Cut", this); actions << cut;
-    connect(cut, SIGNAL(triggered()), codeEditor, SLOT(cut()));
+    connect(cut, SIGNAL(triggered()), editorStack, SLOT(cut()));
 
     QAction* copy = new QAction("Copy", this); actions << copy;
-    connect(copy, SIGNAL(triggered()), codeEditor, SLOT(copy()));
+    connect(copy, SIGNAL(triggered()), editorStack, SLOT(copy()));
 
     QAction* paste = new QAction("Paste", this); actions << paste;
-    connect(paste, SIGNAL(triggered()), codeEditor, SLOT(paste()));
+    connect(paste, SIGNAL(triggered()), editorStack, SLOT(paste()));
 
     QAction* selectAll = new QAction("Select All", this); actions << selectAll;
-    connect(selectAll, SIGNAL(triggered()), codeEditor, SLOT(selectAll()));
+    connect(selectAll, SIGNAL(triggered()), editorStack, SLOT(selectAll()));
 
     QAction* run = new QAction("Run", this); actions << run;
     connect(run, SIGNAL(triggered()), this, SLOT(run()));
 
     QAction* zoomIn = new QAction("Zoom In", this); actions << zoomIn;
-    connect(zoomIn, SIGNAL(triggered()), codeEditor, SLOT(zoomIn()));
+    connect(zoomIn, SIGNAL(triggered()), editorStack, SLOT(zoomIn()));
 
     QAction* zoomOut = new QAction("Zoom Out", this); actions << zoomOut;
     connect(zoomOut, SIGNAL(triggered()), codeEditor, SLOT(zoomOut()));
@@ -163,16 +170,16 @@ void PyletWindow::initWidgets() {
             zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
     toolBar->addAction(QIcon(runIcon), "Run File", this, SLOT(run()));
     toolBar->addSeparator();
-    toolBar->addAction(QIcon(cutIcon), "Cut", codeEditor, SLOT(cut()));
-    toolBar->addAction(QIcon(copyIcon), "Copy", codeEditor, SLOT(copy()));
-    toolBar->addAction(QIcon(pasteIcon), "Paste", codeEditor, SLOT(paste()));
+    toolBar->addAction(QIcon(cutIcon), "Cut", editorStack, SLOT(cut()));
+    toolBar->addAction(QIcon(copyIcon), "Copy", editorStack, SLOT(copy()));
+    toolBar->addAction(QIcon(pasteIcon), "Paste", editorStack, SLOT(paste()));
     toolBar->addSeparator();
-    toolBar->addAction(QIcon(undoIcon), "Undo", codeEditor, SLOT(undo()));
-    toolBar->addAction(QIcon(redoIcon), "Redo", codeEditor, SLOT(redo()));
+    toolBar->addAction(QIcon(undoIcon), "Undo", editorStack, SLOT(undo()));
+    toolBar->addAction(QIcon(redoIcon), "Redo", editorStack, SLOT(redo()));
     toolBar->addSeparator();
-    toolBar->addAction(QIcon(zoomInIcon), "Zoom In", codeEditor, SLOT(zoomIn()));
-    toolBar->addAction(QIcon(zoomOutIcon), "Zoom Out", codeEditor, SLOT(zoomOut()));
-    toolBar->addAction(QIcon(zoomResetIcon), "Reset Zoom", codeEditor, SLOT(resetZoom()));
+    toolBar->addAction(QIcon(zoomInIcon), "Zoom In", editorStack, SLOT(zoomIn()));
+    toolBar->addAction(QIcon(zoomOutIcon), "Zoom Out", editorStack, SLOT(zoomOut()));
+    toolBar->addAction(QIcon(zoomResetIcon), "Reset Zoom", editorStack, SLOT(resetZoom()));
 
     statusBar();
 }
