@@ -1,6 +1,6 @@
 /*
 * Copyright (c) 2016 Jake Dharmasiri.
-* Licensed under the GNU GPLv3 License. See LICENSE.md for details.
+* Licensed under the GNU GPLv3 License. See LICENSE for details.
 */
 
 #include "pylet_window.h"
