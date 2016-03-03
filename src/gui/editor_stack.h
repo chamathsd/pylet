@@ -24,6 +24,9 @@ public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
+
+private slots:
+    void closeTab(int);
 };
 
 

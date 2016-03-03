@@ -12,6 +12,12 @@ EditorStack::EditorStack(QWidget *parent) : QTabWidget(parent) {
     setStyleSheet("QTabBar::tab { height: 30px; }");
     setTabsClosable(true);
     setMovable(true);
+
+    connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+}
+
+void EditorStack::closeTab(int index) {
+    removeTab(index);
 }
 
 /*
