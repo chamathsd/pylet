@@ -22,6 +22,11 @@ void Console::runFile(const QString &filename) {
     ensureCursorVisible();
 }
 
+void Console::throwError(const QString &message) {
+    QString htmlString = "<font color = \"red\">[Pylet] " + message + "</font>";
+    appendHtml(htmlString);
+}
+
 QString Console::generateRestartString() {
     int fontWidth = fontMetrics().width('=');
     QString spacer(((width() - 140) / fontWidth) / 2, '=');

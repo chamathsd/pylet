@@ -195,6 +195,6 @@ void PyletWindow::run() {
         console->runFile(tempFile.fileName());
         tempFile.remove();
     } else {
-        qDebug() << "No valid CodeEditor to run on editor stack - are any files open?";
+        console->throwError("No active files to run.");
     }
 }

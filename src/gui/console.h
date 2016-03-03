@@ -14,6 +14,7 @@ class Console : public QPlainTextEdit {
 public:
     Console(QWidget *parent = 0);
     void runFile(const QString &filename);
+    void throwError(const QString &message);
 
 private:
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
