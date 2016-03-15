@@ -5,6 +5,7 @@
 
 #include "gui/pylet_window.h"
 #include <qapplication.h>
+#include <qmessagebox.h>
 #include <qsettings.h>
 #include <sstream>
 #include <iostream>
@@ -22,6 +23,52 @@ int main(int argc, char *argv[]) {
     return app.exec();
 }
 
+static void g_initFonts(const QApplication &application) {
+    application.font().setStyleStrategy(QFont::PreferAntialias);
+    application.setFont(application.font());
+
+    // Dynamically load fonts
+    QStringList list;
+    list << "SourceCodePro-Black.ttf" <<
+        "SourceCodePro-Bold.ttf" <<
+        "SourceCodePro-ExtraLight.ttf" <<
+        "SourceCodePro-Light.ttf" <<
+        "SourceCodePro-Medium.ttf" <<
+        "SourceCodePro-Regular.ttf" <<
+        "SourceCodePro-Semibold.ttf" <<
+        "SourceSansPro-BlackItalic.ttf" <<
+        "SourceSansPro-Black.ttf" <<
+        "SourceSansPro-BoldItalic.ttf" <<
+        "SourceSansPro-Bold.ttf" <<
+        "SourceSansPro-ExtraLightItalic.ttf" <<
+        "SourceSansPro-ExtraLight.ttf" <<
+        "SourceSansPro-Italic.ttf" <<
+        "SourceSansPro-LightItalic.ttf" <<
+        "SourceSansPro-Light.ttf" <<
+        "SourceSansPro-Regular.ttf" <<
+        "SourceSansPro-SemiboldItalic.ttf" <<
+        "SourceSansPro-Semibold.ttf" <<
+        "MotivaSans-Medium.ttf";
+
+    int fontID(-1);
+    bool fontWarningShown(false);
+    for (auto font : list) {
+        QFile res(":/typeface/" + font);
+        if (!res.open(QIODevice::ReadOnly)) {
+            if (!fontWarningShown) {
+                QMessageBox::warning(0, "Application", (QString) "Warning: Unable to load font " + QChar(0x00AB) + font + QChar(0x00BB) + ".");
+                fontWarningShown = true;
+            }
+        } else {
+            fontID = QFontDatabase::addApplicationFontFromData(res.readAll());
+            if (fontID == -1 && !fontWarningShown) {
+                QMessageBox::warning(0, "Application", (QString) "Warning: Unable to load font " + QChar(0x00AB) + font + QChar(0x00BB) + ".");
+                fontWarningShown = true;
+            }
+        }
+    }
+}
+
 static void g_initSettings(const QApplication &application) {
     QString configFile = "config.ini";
     QSettings config(configFile, QSettings::IniFormat);
@@ -37,6 +84,7 @@ static void g_initSettings(const QApplication &application) {
 
         config.beginGroup("Shortcuts");
 
+        config.setValue("Save As...", QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
         config.setValue("Undo", QKeySequence(Qt::CTRL + Qt::Key_Z));
         config.setValue("Redo", QKeySequence(Qt::CTRL + Qt::Key_Y));
         config.setValue("Cut", QKeySequence(Qt::CTRL + Qt::Key_X));

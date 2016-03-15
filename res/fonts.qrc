@@ -1,5 +1,24 @@
 <RCC>
     <qresource prefix="/typeface">
-        <file alias="Montserrat-Black.ttf">fonts/motiva-sans-medium.ttf</file>
+		<file alias="SourceSansPro-Black.ttf">fonts/SourceSansPro-Black.ttf</file>
+        <file alias="SourceSansPro-BlackItalic.ttf">fonts/SourceSansPro-BlackItalic.ttf</file>
+        <file alias="SourceSansPro-Bold.ttf">fonts/SourceSansPro-Bold.ttf</file>
+        <file alias="SourceSansPro-BoldItalic.ttf">fonts/SourceSansPro-BoldItalic.ttf</file>
+        <file alias="SourceSansPro-ExtraLight.ttf">fonts/SourceSansPro-ExtraLight.ttf</file>
+        <file alias="SourceSansPro-ExtraLightItalic.ttf">fonts/SourceSansPro-ExtraLightItalic.ttf</file>
+        <file alias="SourceSansPro-Italic.ttf">fonts/SourceSansPro-Italic.ttf</file>
+        <file alias="SourceSansPro-Light.ttf">fonts/SourceSansPro-Light.ttf</file>
+        <file alias="SourceSansPro-LightItalic.ttf">fonts/SourceSansPro-LightItalic.ttf</file>
+        <file alias="SourceSansPro-Regular.ttf">fonts/SourceSansPro-Regular.ttf</file>
+        <file alias="SourceSansPro-Semibold.ttf">fonts/SourceSansPro-Semibold.ttf</file>
+        <file alias="SourceSansPro-SemiboldItalic.ttf">fonts/SourceSansPro-SemiboldItalic.ttf</file>
+        <file alias="SourceCodePro-Black.ttf">fonts/SourceCodePro-Black.ttf</file>
+        <file alias="SourceCodePro-Bold.ttf">fonts/SourceCodePro-Bold.ttf</file>
+        <file alias="SourceCodePro-ExtraLight.ttf">fonts/SourceCodePro-ExtraLight.ttf</file>
+        <file alias="SourceCodePro-Light.ttf">fonts/SourceCodePro-Light.ttf</file>
+        <file alias="SourceCodePro-Medium.ttf">fonts/SourceCodePro-Medium.ttf</file>
+        <file alias="SourceCodePro-Regular.ttf">fonts/SourceCodePro-Regular.ttf</file>
+        <file alias="SourceCodePro-Semibold.ttf">fonts/SourceCodePro-Semibold.ttf</file>
+		<file alias="MotivaSans-Medium.ttf">fonts/motiva-sans-medium.ttf</file>
     </qresource>
 </RCC>
