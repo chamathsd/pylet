@@ -15,6 +15,8 @@ public:
     EditorStack(QWidget *parent);
 
 public slots:
+    void save();
+    void saveAs();
     void undo();
     void redo();
     void cut();

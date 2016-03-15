@@ -5,7 +5,10 @@
 
 #include "code_editor_interface.h"
 #include "editor_stack.h"
-
+#include <qstandardpaths.h>
+#include <qmessagebox.h>
+#include <qfiledialog.h>
+#include <qpainter.h>
 #include <qdebug.h>
 
 EditorStack::EditorStack(QWidget *parent) : QTabWidget(parent) {
@@ -23,6 +26,33 @@ void EditorStack::closeTab(int index) {
 /*
 * Series of slots that re-route global shortcuts to editor windows.
 */
+
+void EditorStack::save() {
+    return;
+}
+
+void EditorStack::saveAs() {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
+        QString filename = QFileDialog::getSaveFileName(this, tr("Save File As"),
+            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+            "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
+        if (filename != "") {
+            QFile saveFile(filename);
+
+            if (saveFile.open(QIODevice::ReadWrite)) {
+                QTextStream stream(&saveFile);
+                stream << c->toPlainText();
+                saveFile.flush();
+                saveFile.close();
+            } else {
+                QMessageBox::critical(this, tr("Error"), tr("Unable to write file at the specified location."));
+                return;
+            }
+        }
+    } else {
+        qDebug() << "Nothing to save - are any files open?";
+    }
+}
 
 void EditorStack::undo() {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {

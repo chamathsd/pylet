@@ -88,6 +88,8 @@ void PyletWindow::initWidgets() {
 
 
     /* Do action population and fill out menus correspondingly */
+    QAction* saveAs = new QAction("Save As...", this); actions << saveAs;
+    connect(saveAs, SIGNAL(triggered()), editorStack, SLOT(saveAs()));
 
     QAction* undo = new QAction("Undo", this); actions << undo;
     connect(undo, SIGNAL(triggered()), editorStack, SLOT(undo()));
@@ -114,10 +116,10 @@ void PyletWindow::initWidgets() {
     connect(zoomIn, SIGNAL(triggered()), editorStack, SLOT(zoomIn()));
 
     QAction* zoomOut = new QAction("Zoom Out", this); actions << zoomOut;
-    connect(zoomOut, SIGNAL(triggered()), codeEditor, SLOT(zoomOut()));
+    connect(zoomOut, SIGNAL(triggered()), editorStack, SLOT(zoomOut()));
 
     QAction *resetZoom = new QAction("Reset Zoom", this); actions << resetZoom;
-    connect(resetZoom, SIGNAL(triggered()), codeEditor, SLOT(resetZoom()));
+    connect(resetZoom, SIGNAL(triggered()), editorStack, SLOT(resetZoom()));
 
     for (int i = 0; i < actions.size(); ++i) {
         QAction *a = actions.at(i);
@@ -136,6 +138,7 @@ void PyletWindow::initWidgets() {
 
     /* QMenu population */
     QMenu *fileMenu = menuBar()->addMenu("File");
+        fileMenu->addAction(saveAs);
     QMenu *editMenu = menuBar()->addMenu("Edit");
         editMenu->addAction(undo);
         editMenu->addAction(redo);
