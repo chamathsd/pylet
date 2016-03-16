@@ -12,7 +12,11 @@
 #include <qtextobject.h>
 #include <qpainter.h>
 
-CodeEditor::CodeEditor(QSettings* s, QWidget* parent) : QPlainTextEdit(parent) {
+CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath)
+    : QPlainTextEdit(parent) {
+
+    location = filePath;
+
     lineNumbers = new LineNumberWidget(this);
 
     updateLineNumbersWidth(0);

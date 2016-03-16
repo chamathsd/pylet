@@ -71,9 +71,9 @@ void PyletWindow::initWidgets() {
     coreWidget->insertWidget(1, editorStack);
 
     codeEditor = new CodeEditor(s, editorStack);
-    editorStack->addTab(codeEditor, "ps3pr1.py");
+    editorStack->addTab(codeEditor, "untitled1");
     CodeEditor *codeEditor2 = new CodeEditor(s, editorStack);
-    editorStack->addTab(codeEditor2, "ps3pr2.py");
+    editorStack->addTab(codeEditor2, "untitled2");
     // codeEditor->setMinimumWidth(280);
 
     console = new Console(coreWidget);
@@ -88,6 +88,9 @@ void PyletWindow::initWidgets() {
 
 
     /* Do action population and fill out menus correspondingly */
+    QAction* save = new QAction("Save", this); actions << save;
+    connect(save, SIGNAL(triggered()), editorStack, SLOT(save()));
+
     QAction* saveAs = new QAction("Save As...", this); actions << saveAs;
     connect(saveAs, SIGNAL(triggered()), editorStack, SLOT(saveAs()));
 
@@ -138,6 +141,7 @@ void PyletWindow::initWidgets() {
 
     /* QMenu population */
     QMenu *fileMenu = menuBar()->addMenu("File");
+        fileMenu->addAction(save);
         fileMenu->addAction(saveAs);
     QMenu *editMenu = menuBar()->addMenu("Edit");
         editMenu->addAction(undo);

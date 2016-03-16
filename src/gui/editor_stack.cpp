@@ -27,8 +27,34 @@ void EditorStack::closeTab(int index) {
 * Series of slots that re-route global shortcuts to editor windows.
 */
 
+void EditorStack::fileStream(CodeEditor* c, QFile* saveFile) {
+    if (saveFile->open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        QTextStream stream(saveFile);
+        stream << c->toPlainText();
+        saveFile->flush();
+        saveFile->close();
+
+        c->location = QFileInfo(*saveFile).canonicalFilePath();
+        setTabText(indexOf(c), QFileInfo(*saveFile).fileName());
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Unable to write file at the specified location."));
+
+        return;
+    }
+}
+
 void EditorStack::save() {
-    return;
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
+        QFile* saveFile = new QFile(c->location);
+        if (c->location != "" && saveFile->exists()) {
+            fileStream(c, saveFile);
+        } else {
+            saveAs();
+        }
+        delete saveFile;
+    } else {
+        qDebug() << "Nothing to save - are any files open?";
+    }
 }
 
 void EditorStack::saveAs() {
@@ -37,17 +63,9 @@ void EditorStack::saveAs() {
             QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
             "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
         if (filename != "") {
-            QFile saveFile(filename);
-
-            if (saveFile.open(QIODevice::ReadWrite)) {
-                QTextStream stream(&saveFile);
-                stream << c->toPlainText();
-                saveFile.flush();
-                saveFile.close();
-            } else {
-                QMessageBox::critical(this, tr("Error"), tr("Unable to write file at the specified location."));
-                return;
-            }
+            QFile* saveFile = new QFile(filename, c);
+            fileStream(c, saveFile);
+            delete saveFile;
         }
     } else {
         qDebug() << "Nothing to save - are any files open?";

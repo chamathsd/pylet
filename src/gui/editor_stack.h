@@ -14,6 +14,9 @@ class EditorStack : public QTabWidget {
 public:
     EditorStack(QWidget *parent);
 
+private:
+    void fileStream(CodeEditor* c, QFile* saveFile);
+
 public slots:
     void save();
     void saveAs();
