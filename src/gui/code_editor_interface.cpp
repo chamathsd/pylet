@@ -11,11 +11,11 @@
 #include <qcoreapplication.h>
 #include <qtextobject.h>
 #include <qpainter.h>
+#include <qdebug.h>
 
-CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath)
-    : QPlainTextEdit(parent) {
-
-    location = filePath;
+CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath) : 
+    location(filePath), 
+    QPlainTextEdit(parent) {
 
     lineNumbers = new LineNumberWidget(this);
 

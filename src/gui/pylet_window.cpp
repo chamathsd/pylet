@@ -66,14 +66,12 @@ void PyletWindow::initWidgets() {
     infoBox->setText("Info Box");
     navLayout->addWidget(infoBox, 1);
 
-    editorStack = new EditorStack(coreWidget);
+    editorStack = new EditorStack(s, coreWidget);
     editorStack->setMinimumWidth(280);
     coreWidget->insertWidget(1, editorStack);
 
-    codeEditor = new CodeEditor(s, editorStack);
-    editorStack->addTab(codeEditor, "untitled1");
-    CodeEditor *codeEditor2 = new CodeEditor(s, editorStack);
-    editorStack->addTab(codeEditor2, "untitled2");
+    editorStack->insertEditor();
+    editorStack->insertEditor();
     // codeEditor->setMinimumWidth(280);
 
     console = new Console(coreWidget);

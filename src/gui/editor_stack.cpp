@@ -3,7 +3,6 @@
 * Licensed under the GNU GPLv3 License. See LICENSE for details.
 */
 
-#include "code_editor_interface.h"
 #include "editor_stack.h"
 #include <qstandardpaths.h>
 #include <qmessagebox.h>
@@ -11,7 +10,10 @@
 #include <qpainter.h>
 #include <qdebug.h>
 
-EditorStack::EditorStack(QWidget *parent) : QTabWidget(parent) {
+EditorStack::EditorStack(QSettings* s, QWidget *parent) : 
+    settingsPtr(s), 
+    QTabWidget(parent) {
+
     setStyleSheet("QTabBar::tab { height: 30px; }");
     setTabsClosable(true);
     setMovable(true);
@@ -19,8 +21,41 @@ EditorStack::EditorStack(QWidget *parent) : QTabWidget(parent) {
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 }
 
+void EditorStack::insertEditor(const QString &filePath) {
+    CodeEditor* codeEditor = new CodeEditor(settingsPtr, this);
+
+    int fileID = 1;
+    QMap<int, CodeEditor*>::iterator iter = untrackedFiles.begin();
+    while (fileID == iter.key() && iter != untrackedFiles.end()) {
+        fileID += 1;
+        ++iter;
+    }
+    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
+    untrackedFiles.insert(fileID, codeEditor);
+
+    connect(codeEditor, SIGNAL(modificationChanged(bool)),
+        this, SLOT(flagAsModified(bool)));
+}
+
 void EditorStack::closeTab(int index) {
     removeTab(index);
+}
+
+void EditorStack::flagAsModified(bool modified) {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(QObject::sender())) {
+        if (!c->filename.isNull()) {
+            setTabText(indexOf(c), c->filename + "*");
+        }
+    }
+}
+
+CodeEditor* EditorStack::currentEditor() {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
+        return c;
+    } else {
+        qDebug() << "Cast to CodeEditor failed on EditorStack";
+        return nullptr;
+    }
 }
 
 /*
@@ -35,11 +70,10 @@ void EditorStack::fileStream(CodeEditor* c, QFile* saveFile) {
         saveFile->close();
 
         c->location = QFileInfo(*saveFile).canonicalFilePath();
-        setTabText(indexOf(c), QFileInfo(*saveFile).fileName());
+        c->filename = QFileInfo(*saveFile).fileName();
+        c->document()->setModified(false);
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Unable to write file at the specified location."));
-
-        return;
     }
 }
 
@@ -48,6 +82,7 @@ void EditorStack::save() {
         QFile* saveFile = new QFile(c->location);
         if (c->location != "" && saveFile->exists()) {
             fileStream(c, saveFile);
+            setTabText(indexOf(c), c->filename);
         } else {
             saveAs();
         }
@@ -65,6 +100,7 @@ void EditorStack::saveAs() {
         if (filename != "") {
             QFile* saveFile = new QFile(filename, c);
             fileStream(c, saveFile);
+            setTabText(indexOf(c), c->filename);
             delete saveFile;
         }
     } else {
@@ -73,51 +109,27 @@ void EditorStack::saveAs() {
 }
 
 void EditorStack::undo() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->undo();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot undo()";
-    }
+    currentEditor()->undo();
 }
 
 void EditorStack::redo() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->redo();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot undo()";
-    }
+    currentEditor()->redo();
 }
 
 void EditorStack::cut() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->cut();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot cut()";
-    }
+    currentEditor()->cut();
 }
 
 void EditorStack::copy() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->copy();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot copy()";
-    }
+    currentEditor()->copy();
 }
 
 void EditorStack::paste() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->paste();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot paste()";
-    }
+    currentEditor()->paste();
 }
 
 void EditorStack::selectAll() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        c->selectAll();
-    } else {
-        qDebug() << "Cast to CodeEditor failed in EditorStack slot selectAll()";
-    }
+    currentEditor()->selectAll();
 }
 
 void EditorStack::zoomIn() {
