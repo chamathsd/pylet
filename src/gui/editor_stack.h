@@ -19,12 +19,22 @@ public:
 
 private:
     void fileStream(CodeEditor* c, QFile* saveFile);
-    QSettings* settingsPtr;
+    void refresh(CodeEditor* c);
+    int generateUntrackedID();
     QMap<int, CodeEditor*> untrackedFiles;
+    QSettings* settingsPtr;
+    bool modificationQueued = false;
+    bool saveQueued = false;
+
+private slots:
+    void closeTab(int index, bool forceClose = false);
+    void manageFocus();
+    void flagAsModified(bool);
+    void manageExternalModification();
 
 public slots:
-    void save();
-    void saveAs();
+    void save(bool forceSave = false);
+    int saveAs();
     void undo();
     void redo();
     void cut();
@@ -34,11 +44,6 @@ public slots:
     void zoomIn();
     void zoomOut();
     void resetZoom();
-
-private slots:
-    void closeTab(int);
-    void flagAsModified(bool);
 };
-
 
 #endif // EDITOR_STACK_H

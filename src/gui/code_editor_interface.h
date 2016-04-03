@@ -10,6 +10,7 @@
 #define CODE_EDITOR_INTERFACE_H
 
 #include "code_editor_highlighter.h"
+#include <qfilesystemwatcher.h>
 #include <qplaintextedit.h>
 #include <qsettings.h>
 
@@ -18,6 +19,7 @@ class CodeEditor : public QPlainTextEdit {
 
 public:
     CodeEditor(QSettings *s, QWidget* parent = 0, const QString &filePath = "");
+    QFileSystemWatcher* watchdog = nullptr;
     QString filename;
     QString location;
 
@@ -25,6 +27,8 @@ public:
     int lineNumbersWidth();
     int tabSpacing;
     bool tabsEmitSpaces;
+    bool pendingRefresh = false;
+    int untrackedID = 0;
 
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

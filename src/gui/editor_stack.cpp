@@ -4,7 +4,9 @@
 */
 
 #include "editor_stack.h"
+#include <qfilesystemwatcher.h>
 #include <qstandardpaths.h>
+#include <qapplication.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qpainter.h>
@@ -19,34 +21,7 @@ EditorStack::EditorStack(QSettings* s, QWidget *parent) :
     setMovable(true);
 
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-}
-
-void EditorStack::insertEditor(const QString &filePath) {
-    CodeEditor* codeEditor = new CodeEditor(settingsPtr, this);
-
-    int fileID = 1;
-    QMap<int, CodeEditor*>::iterator iter = untrackedFiles.begin();
-    while (fileID == iter.key() && iter != untrackedFiles.end()) {
-        fileID += 1;
-        ++iter;
-    }
-    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
-    untrackedFiles.insert(fileID, codeEditor);
-
-    connect(codeEditor, SIGNAL(modificationChanged(bool)),
-        this, SLOT(flagAsModified(bool)));
-}
-
-void EditorStack::closeTab(int index) {
-    removeTab(index);
-}
-
-void EditorStack::flagAsModified(bool modified) {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(QObject::sender())) {
-        if (!c->filename.isNull()) {
-            setTabText(indexOf(c), c->filename + "*");
-        }
-    }
+    connect(qApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(manageFocus()));
 }
 
 CodeEditor* EditorStack::currentEditor() {
@@ -58,12 +33,22 @@ CodeEditor* EditorStack::currentEditor() {
     }
 }
 
-/*
-* Series of slots that re-route global shortcuts to editor windows.
-*/
+void EditorStack::insertEditor(const QString &filePath) {
+    CodeEditor* codeEditor = new CodeEditor(settingsPtr, this);
+
+    int fileID = generateUntrackedID();
+    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
+    untrackedFiles.insert(fileID, codeEditor);
+    codeEditor->untrackedID = fileID;
+
+    connect(codeEditor, SIGNAL(modificationChanged(bool)),
+        this, SLOT(flagAsModified(bool)));
+}
 
 void EditorStack::fileStream(CodeEditor* c, QFile* saveFile) {
     if (saveFile->open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        saveQueued = true;
+
         QTextStream stream(saveFile);
         stream << c->toPlainText();
         saveFile->flush();
@@ -77,8 +62,114 @@ void EditorStack::fileStream(CodeEditor* c, QFile* saveFile) {
     }
 }
 
-void EditorStack::save() {
+void EditorStack::refresh(CodeEditor* c) {
+    setCurrentWidget(c);
+    QFile* checkFile = new QFile(c->location);
+    if (checkFile->exists()) {
+        QMessageBox::StandardButton reload;
+        reload = QMessageBox::question(this, "Reload", "The following file has been modified by another program:\n\n" +
+            QFileInfo(*checkFile).absoluteFilePath() + "\n\nDo you want to reload it?",
+            QMessageBox::Yes | QMessageBox::No);
+        if (reload == QMessageBox::Yes) {
+            if (checkFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QTextStream stream(checkFile);
+                c->setPlainText(stream.readAll());
+                setTabText(indexOf(c), c->filename);
+                modificationQueued = true;
+            }
+            checkFile->close();
+        } else {
+            save(true);
+        }
+    } else {
+        QMessageBox::StandardButton saveNew;
+        saveNew = QMessageBox::question(this, "Save New", "The following file has been deleted or renamed:\n\n" +
+            QFileInfo(*checkFile).absoluteFilePath() + "\n\nWould you like to save a new copy?",
+            QMessageBox::Yes | QMessageBox::No);
+        if (saveNew == QMessageBox::No || saveAs() != 0) {
+            c->location = "";
+            c->filename = nullptr;
+            int fileID = generateUntrackedID();
+            setTabText(indexOf(c), "untitled" + QString::number(fileID) + ".py");
+            untrackedFiles.insert(fileID, c);
+            c->untrackedID = fileID;
+        }
+    }
+    delete checkFile;
+}
+
+int EditorStack::generateUntrackedID() {
+    int id = 1;
+    QMap<int, CodeEditor*>::iterator iter = untrackedFiles.begin();
+    while (id == iter.key() && iter != untrackedFiles.end()) {
+        id += 1;
+        ++iter;
+    }
+    return id;
+}
+
+void EditorStack::closeTab(int index, bool forceClose) {
+    removeTab(index);
+}
+
+void EditorStack::manageFocus() {
+    if (qApp->applicationState() == Qt::ApplicationActive) {
+        for (int index = 0; index < count(); ++index) {
+            if (CodeEditor* c = qobject_cast<CodeEditor*>(widget(index))) {
+                if (c->pendingRefresh) {
+                    refresh(c);
+                    c->pendingRefresh = false;
+                }
+            }
+        }
+    }
+}
+
+void EditorStack::flagAsModified(bool modified) {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(QObject::sender())) {
+        if (!modificationQueued) {
+            if (!c->filename.isNull()) {
+                setTabText(indexOf(c), c->filename + "*");
+            }
+        } else {
+            c->document()->setModified(false);
+            modificationQueued = false;
+        }
+    }
+}
+
+void EditorStack::manageExternalModification() {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(QObject::sender()->parent())) {
+        if (qApp->applicationState() != Qt::ApplicationInactive) {
+            for (int index = 0; index < count(); ++index) {
+                if (CodeEditor* ce = qobject_cast<CodeEditor*>(widget(index))) {
+                    if (c->location == ce->location) {
+                        closeTab(indexOf(c));
+                        return;
+                    }
+                }
+            }
+            if (!saveQueued) {
+                refresh(c);
+            } else {
+                saveQueued = false;
+            }
+        } else {
+            c->pendingRefresh = true;
+        }
+    }
+}
+
+/*
+* Series of slots that re-route global shortcuts to editor windows.
+*/
+
+void EditorStack::save(bool forceSave) {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
+        if (!c->document()->isModified() && !forceSave) {
+            qDebug() << "Nothing to save - file has not been modified.";
+            return;
+        }
         QFile* saveFile = new QFile(c->location);
         if (c->location != "" && saveFile->exists()) {
             fileStream(c, saveFile);
@@ -87,12 +178,13 @@ void EditorStack::save() {
             saveAs();
         }
         delete saveFile;
+        qDebug() << "File saved.";
     } else {
         qDebug() << "Nothing to save - are any files open?";
     }
 }
 
-void EditorStack::saveAs() {
+int EditorStack::saveAs() {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
         QString filename = QFileDialog::getSaveFileName(this, tr("Save File As"),
             QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
@@ -101,10 +193,27 @@ void EditorStack::saveAs() {
             QFile* saveFile = new QFile(filename, c);
             fileStream(c, saveFile);
             setTabText(indexOf(c), c->filename);
+            saveQueued = false;
             delete saveFile;
+
+            untrackedFiles.remove(c->untrackedID);
+            c->untrackedID = 0;
+
+            c->watchdog = new QFileSystemWatcher(c);
+            if (c->watchdog->addPath(filename)) {
+                connect(c->watchdog, SIGNAL(fileChanged(QString)), this, SLOT(manageExternalModification()));
+            } else {
+                qDebug() << "Unable to set file watchdog at path " << filename;
+            }
+            qDebug() << "File saved for the first time.";
+            return 0;
+        } else {
+            qDebug() << "Filename is empty.";
+            return 1;
         }
     } else {
         qDebug() << "Nothing to save - are any files open?";
+        return 2;
     }
 }
 
