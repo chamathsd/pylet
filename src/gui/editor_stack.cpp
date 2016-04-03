@@ -33,18 +33,6 @@ CodeEditor* EditorStack::currentEditor() {
     }
 }
 
-void EditorStack::insertEditor(const QString &filePath) {
-    CodeEditor* codeEditor = new CodeEditor(settingsPtr, this);
-
-    int fileID = generateUntrackedID();
-    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
-    untrackedFiles.insert(fileID, codeEditor);
-    codeEditor->untrackedID = fileID;
-
-    connect(codeEditor, SIGNAL(modificationChanged(bool)),
-        this, SLOT(flagAsModified(bool)));
-}
-
 void EditorStack::fileStream(CodeEditor* c, QFile* saveFile) {
     if (saveFile->open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
         saveQueued = true;
@@ -189,6 +177,21 @@ void EditorStack::manageExternalModification() {
     }
 }
 
+void EditorStack::insertEditor(const QString &filePath) {
+    CodeEditor* codeEditor = new CodeEditor(settingsPtr, this, filePath);
+
+    int fileID = generateUntrackedID();
+    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
+    untrackedFiles.insert(fileID, codeEditor);
+    codeEditor->untrackedID = fileID;
+
+    connect(codeEditor, SIGNAL(modificationChanged(bool)),
+        this, SLOT(flagAsModified(bool)));
+
+    codeEditor->resetZoom(globalZoom);
+    setCurrentWidget(codeEditor);
+}
+
 /*
 * Series of slots that re-route global shortcuts to editor windows.
 */
@@ -277,6 +280,7 @@ void EditorStack::zoomIn() {
             c->zoomInSlot();
         }
     }
+    globalZoom += 2;
 }
 
 void EditorStack::zoomOut() {
@@ -285,6 +289,7 @@ void EditorStack::zoomOut() {
             c->zoomOutSlot();
         }
     }
+    globalZoom += 2;
 }
 
 void EditorStack::resetZoom() {
@@ -293,4 +298,5 @@ void EditorStack::resetZoom() {
             c->resetZoom();
         }
     }
+    globalZoom = 12;
 }

@@ -253,8 +253,8 @@ void CodeEditor::zoomOutSlot() {
     this->zoomOut(2);
 }
 
-void CodeEditor::resetZoom() {
+void CodeEditor::resetZoom(int zoom) {
     QFont f = font();
-    f.setPointSize(12);
+    f.setPointSize(zoom);
     setFont(f);
 }

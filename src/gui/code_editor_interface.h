@@ -47,7 +47,7 @@ private slots:
 public slots:
     void zoomInSlot();
     void zoomOutSlot();
-    void resetZoom();
+    void resetZoom(int zoom = 12);
 };
 
 #endif // CODE_EDITOR_INTERFACE_H

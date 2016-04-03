@@ -71,7 +71,6 @@ void PyletWindow::initWidgets() {
     coreWidget->insertWidget(1, editorStack);
 
     editorStack->insertEditor();
-    editorStack->insertEditor();
     // codeEditor->setMinimumWidth(280);
 
     console = new Console(coreWidget);
@@ -87,6 +86,9 @@ void PyletWindow::initWidgets() {
     connect(editorStack, SIGNAL(currentChanged(int)), this, SLOT(updateWindowTitle(int)));
 
     /* Do action population and fill out menus correspondingly */
+    QAction* newFile = new QAction("New", this); actions << newFile;
+    connect(newFile, SIGNAL(triggered()), editorStack, SLOT(insertEditor()));
+
     QAction* save = new QAction("Save", this); actions << save;
     connect(save, SIGNAL(triggered()), editorStack, SLOT(save()));
 
@@ -140,6 +142,8 @@ void PyletWindow::initWidgets() {
 
     /* QMenu population */
     QMenu *fileMenu = menuBar()->addMenu("File");
+        fileMenu->addAction(newFile);
+        fileMenu->addSeparator();
         fileMenu->addAction(save);
         fileMenu->addAction(saveAs);
     QMenu *editMenu = menuBar()->addMenu("Edit");
@@ -164,7 +168,8 @@ void PyletWindow::initWidgets() {
     /* QToolBar population */
     toolBar = addToolBar("Action Bar");
     
-    QPixmap runIcon(":/pylet_icons/icons/run.png"),
+    QPixmap newIcon(":/pylet_icons/icons/new-file.png"),
+            runIcon(":/pylet_icons/icons/run.png"),
             cutIcon(":/pylet_icons/icons/cut.png"),
             copyIcon(":/pylet_icons/icons/copy.png"),
             pasteIcon(":/pylet_icons/icons/paste.png"),
@@ -173,6 +178,8 @@ void PyletWindow::initWidgets() {
             zoomInIcon(":/pylet_icons/icons/zoom-in.png"),
             zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
             zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
+    toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
+    toolBar->addSeparator();
     toolBar->addAction(QIcon(runIcon), "Run File", this, SLOT(run()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(cutIcon), "Cut", editorStack, SLOT(cut()));

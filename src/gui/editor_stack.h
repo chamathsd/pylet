@@ -15,7 +15,6 @@ class EditorStack : public QTabWidget {
 public:
     EditorStack(QSettings* s, QWidget *parent);
     CodeEditor* currentEditor();
-    void insertEditor(const QString &filePath = "");
 
 private:
     void fileStream(CodeEditor* c, QFile* saveFile);
@@ -25,6 +24,7 @@ private:
     QSettings* settingsPtr;
     bool modificationQueued = false;
     bool saveQueued = false;
+    int globalZoom = 12;
 
 private slots:
     void closeTab(int index, bool forceClose = false);
@@ -33,6 +33,7 @@ private slots:
     void manageExternalModification();
 
 public slots:
+    void insertEditor(const QString &filePath = "");
     void save(bool forceSave = false);
     int saveAs();
     void undo();
