@@ -95,6 +95,9 @@ void PyletWindow::initWidgets() {
     QAction* saveAs = new QAction("Save As...", this); actions << saveAs;
     connect(saveAs, SIGNAL(triggered()), editorStack, SLOT(saveAs()));
 
+    QAction* saveAll = new QAction("Save All", this); actions << saveAll;
+    connect(saveAll, SIGNAL(triggered()), editorStack, SLOT(saveAll()));
+
     QAction* undo = new QAction("Undo", this); actions << undo;
     connect(undo, SIGNAL(triggered()), editorStack, SLOT(undo()));
 
@@ -146,6 +149,7 @@ void PyletWindow::initWidgets() {
         fileMenu->addSeparator();
         fileMenu->addAction(save);
         fileMenu->addAction(saveAs);
+        fileMenu->addAction(saveAll);
     QMenu *editMenu = menuBar()->addMenu("Edit");
         editMenu->addAction(undo);
         editMenu->addAction(redo);
@@ -169,6 +173,8 @@ void PyletWindow::initWidgets() {
     toolBar = addToolBar("Action Bar");
     
     QPixmap newIcon(":/pylet_icons/icons/new-file.png"),
+            saveIcon(":/pylet_icons/icons/save.png"),
+            saveAllIcon(":/pylet_icons/icons/save-all.png"),
             runIcon(":/pylet_icons/icons/run.png"),
             cutIcon(":/pylet_icons/icons/cut.png"),
             copyIcon(":/pylet_icons/icons/copy.png"),
@@ -179,6 +185,8 @@ void PyletWindow::initWidgets() {
             zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
             zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
     toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
+    toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));
+    toolBar->addAction(QIcon(saveAllIcon), "Save All", editorStack, SLOT(saveAll()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(runIcon), "Run File", this, SLOT(run()));
     toolBar->addSeparator();

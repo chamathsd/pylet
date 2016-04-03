@@ -86,7 +86,8 @@ static void g_initSettings(const QApplication &application) {
 
         config.setValue("New", QKeySequence(Qt::CTRL + Qt::Key_N));
         config.setValue("Save", QKeySequence(Qt::CTRL + Qt::Key_S));
-        config.setValue("Save As...", QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+        config.setValue("Save As...", QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S));
+        config.setValue("Save All", QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
         config.setValue("Undo", QKeySequence(Qt::CTRL + Qt::Key_Z));
         config.setValue("Redo", QKeySequence(Qt::CTRL + Qt::Key_Y));
         config.setValue("Cut", QKeySequence(Qt::CTRL + Qt::Key_X));

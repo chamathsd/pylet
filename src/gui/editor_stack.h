@@ -34,8 +34,9 @@ private slots:
 
 public slots:
     void insertEditor(const QString &filePath = "");
-    void save(bool forceSave = false);
+    void save(int index = -1, bool forceSave = false);
     int saveAs();
+    void saveAll();
     void undo();
     void redo();
     void cut();

@@ -196,17 +196,22 @@ void EditorStack::insertEditor(const QString &filePath) {
 * Series of slots that re-route global shortcuts to editor windows.
 */
 
-void EditorStack::save(bool forceSave) {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        if (c->location != "" && !c->document()->isModified() && !forceSave) {
+void EditorStack::save(int index, bool forceSave) {
+    if (index == -1)
+        index = indexOf(currentWidget());
+    qDebug() << "Index is:" << index;
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(widget(index))) {
+        if (!c->document()->isModified() && !forceSave) {
             qDebug() << "Nothing to save - file has not been modified.";
             return;
         }
+        qDebug() << "Got here.";
         QFile* saveFile = new QFile(c->location);
         if (c->location != "" && saveFile->exists()) {
             fileStream(c, saveFile);
             setTabText(indexOf(c), c->filename);
         } else {
+            setCurrentWidget(c);
             saveAs();
         }
         delete saveFile;
@@ -219,7 +224,8 @@ void EditorStack::save(bool forceSave) {
 int EditorStack::saveAs() {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
         QString filename = QFileDialog::getSaveFileName(this, tr("Save File As"),
-            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
+            "/untitled" + QString::number(c->untrackedID) + ".py",
             "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
         if (filename != "") {
             QFile* saveFile = new QFile(filename, c);
@@ -247,6 +253,12 @@ int EditorStack::saveAs() {
     } else {
         qDebug() << "Nothing to save - are any files open?";
         return 2;
+    }
+}
+
+void EditorStack::saveAll() {
+    for (int index = 0; index < count(); ++index) {
+        save(index);
     }
 }
 
