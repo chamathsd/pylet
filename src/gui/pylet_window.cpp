@@ -39,7 +39,7 @@ void PyletWindow::initWindow() {
     int screenHeight = screenRect.height();
     resize(screenWidth - 250, screenHeight - 250);
 
-    setWindowTitle("Pylet (Editor)"); 
+    setWindowTitle("Pylet");
 }
 
 void PyletWindow::initWidgets() {
@@ -84,6 +84,7 @@ void PyletWindow::initWidgets() {
 
     coreWidget->setMidLineWidth(8);
 
+    connect(editorStack, SIGNAL(currentChanged(int)), this, SLOT(updateWindowTitle(int)));
 
     /* Do action population and fill out menus correspondingly */
     QAction* save = new QAction("Save", this); actions << save;
@@ -201,5 +202,23 @@ void PyletWindow::run() {
         tempFile.remove();
     } else {
         console->throwError("No active files to run.");
+    }
+}
+
+void PyletWindow::updateWindowTitle(int index) {
+    qDebug() << "Got window update signal.";
+    qDebug() << "Index is:" << index;
+    if (index == -1) {
+        setWindowTitle("Pylet");
+    } else {
+        if (CodeEditor* c = qobject_cast<CodeEditor*>(editorStack->widget(index))) {
+            if (c->filename != nullptr) {
+                setWindowTitle(c->location + " - Pylet");
+            } else {
+                setWindowTitle(editorStack->tabText(index) + " - Pylet");
+            }
+        } else {
+            setWindowTitle("Pylet");
+        }
     }
 }

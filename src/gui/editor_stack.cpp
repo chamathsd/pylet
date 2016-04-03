@@ -109,6 +109,11 @@ int EditorStack::generateUntrackedID() {
 }
 
 void EditorStack::closeTab(int index, bool forceClose) {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(widget(index))) {
+        if (forceClose) {
+            delete c;
+        }
+    }
     removeTab(index);
 }
 
@@ -139,16 +144,9 @@ void EditorStack::flagAsModified(bool modified) {
 }
 
 void EditorStack::manageExternalModification() {
+    qDebug() << "modification triggered";
     if (CodeEditor* c = qobject_cast<CodeEditor*>(QObject::sender()->parent())) {
         if (qApp->applicationState() != Qt::ApplicationInactive) {
-            for (int index = 0; index < count(); ++index) {
-                if (CodeEditor* ce = qobject_cast<CodeEditor*>(widget(index))) {
-                    if (c->location == ce->location) {
-                        closeTab(indexOf(c));
-                        return;
-                    }
-                }
-            }
             if (!saveQueued) {
                 refresh(c);
             } else {
@@ -166,7 +164,7 @@ void EditorStack::manageExternalModification() {
 
 void EditorStack::save(bool forceSave) {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
-        if (!c->document()->isModified() && !forceSave) {
+        if (c->location != "" && !c->document()->isModified() && !forceSave) {
             qDebug() << "Nothing to save - file has not been modified.";
             return;
         }
@@ -205,6 +203,7 @@ int EditorStack::saveAs() {
             } else {
                 qDebug() << "Unable to set file watchdog at path " << filename;
             }
+            currentChanged(indexOf(c));
             qDebug() << "File saved for the first time.";
             return 0;
         } else {

@@ -34,6 +34,7 @@ private:
 
 private slots:
     void run();
+    void updateWindowTitle(int index = -1);
 };
 
 #endif // PYLET_WINDOW_H
