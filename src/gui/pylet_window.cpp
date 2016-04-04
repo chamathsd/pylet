@@ -5,10 +5,8 @@
 
 #include "pylet_window.h"
 #include <qapplication.h>
-#include <qfilesystemmodel.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
-#include <qtreeview.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -51,7 +49,7 @@ void PyletWindow::initWidgets() {
     QWidget* navigator = new QWidget(coreWidget);
     QVBoxLayout* navLayout = new QVBoxLayout(navigator);
     navLayout->setMargin(0);
-    navLayout->setSpacing(0);
+    navLayout->setSpacing(8);
     navigator->setLayout(navLayout);
     navigator->setMaximumWidth(280);
     coreWidget->insertWidget(0, navigator);
@@ -61,11 +59,15 @@ void PyletWindow::initWidgets() {
     crawler->setAlignment(Qt::AlignCenter);
     crawler->setText("File Crawler");
 
-    QFileSystemModel* model = new QFileSystemModel(this);
-    QTreeView* fileTree = new QTreeView(navigator);
-    fileTree->setModel(model);
-    fileTree->setRootIndex(model->index("C:\\"));
-    fileTree->setStyleSheet("background-color: beige;");
+    model = new QFileSystemModel(this);
+    //model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+    fileTree = new QTreeView(navigator);
+    fileTree->setModel(blank);
+    fileTree->setStyleSheet("background-color: #DDD;");
+    fileTree->hideColumn(1);
+    fileTree->hideColumn(2);
+    fileTree->hideColumn(3);
+    connect(fileTree, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(openFromFileTree(const QModelIndex &)));
     navLayout->addWidget(fileTree, 3);
 
     QLabel* infoBox = new QLabel(navigator);
@@ -86,13 +88,14 @@ void PyletWindow::initWidgets() {
     coreWidget->insertWidget(2, console);
     editorStack->console = console;
 
-    coreWidget->setStretchFactor(0, 1);
-    coreWidget->setStretchFactor(1, 5);
+    coreWidget->setStretchFactor(0, 2);
+    coreWidget->setStretchFactor(1, 4);
     coreWidget->setStretchFactor(2, 3);
 
     coreWidget->setMidLineWidth(8);
 
     connect(editorStack, SIGNAL(currentChanged(int)), this, SLOT(updateWindowTitle(int)));
+    connect(editorStack, SIGNAL(currentChanged(int)), this, SLOT(updateFileTree()));
 
     /* Do action population and fill out menus correspondingly */
     QAction* newFile = new QAction("New", this); actions << newFile;
@@ -253,5 +256,28 @@ void PyletWindow::updateWindowTitle(int index) {
         } else {
             setWindowTitle("Pylet");
         }
+    }
+}
+
+void PyletWindow::updateFileTree() {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(editorStack->currentWidget())) {
+        if (c->location != "") {
+            fileTree->setModel(model);
+            QFile checkFile(c->location);
+            qDebug() << "Root path is:" << QFileInfo(checkFile).absolutePath() + "/";
+            model->setRootPath(QString(QDir::Drives));
+            fileTree->setRootIndex(model->index(QFileInfo(checkFile).absolutePath()));
+            model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+        } else {
+            qDebug() << "Triggered";
+            fileTree->setModel(blank);
+        }
+    }
+}
+
+void PyletWindow::openFromFileTree(const QModelIndex &index) {
+    QFile* openFile = new QFile(model->filePath(index));
+    if (QFileInfo(*openFile).isFile()) {
+        editorStack->open(openFile);
     }
 }

@@ -9,7 +9,9 @@
 #include "code_editor_interface.h"
 #include "editor_stack.h"
 #include "console.h"
+#include <qfilesystemmodel.h>
 #include <qmainwindow.h>
+#include <qtreeview.h>
 #include <qtoolbar.h>
 #include <qsettings.h>
 #include <qevent.h>
@@ -27,6 +29,9 @@ private:
     CodeEditor *codeEditor;
     EditorStack *editorStack;
     Console *console;
+    QFileSystemModel* model;
+    QFileSystemModel* blank = new QFileSystemModel(this);
+    QTreeView* fileTree;
     QList<QAction*> actions;
     QToolBar *toolBar;
     QSettings *s;
@@ -34,6 +39,8 @@ private:
 
 private Q_SLOTS:
     void updateWindowTitle(int index = -1);
+    void updateFileTree();
+    void openFromFileTree(const QModelIndex&);
 };
 
 #endif // PYLET_WINDOW_H

@@ -35,7 +35,7 @@ private Q_SLOTS:
 
 public Q_SLOTS:
     CodeEditor* insertEditor(const QString &filePath = "");
-    void open();
+    void open(QFile* openFile = nullptr);
     void save(int index = -1, bool forceSave = false);
     int saveAs();
     void saveAll();

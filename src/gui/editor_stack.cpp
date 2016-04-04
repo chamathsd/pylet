@@ -159,15 +159,20 @@ CodeEditor* EditorStack::insertEditor(const QString &filePath) {
     return codeEditor;
 }
 
-void EditorStack::open() {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
-        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
-        "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
-    if (filename == "")
-        return;
+void EditorStack::open(QFile* openFile) {
+    CodeEditor* codeEditor;
+    if (openFile == nullptr) {
+        QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
+            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+            "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
+        if (filename == "")
+            return;
 
-    CodeEditor* codeEditor = insertEditor(filename);
-    QFile* openFile = new QFile(filename, codeEditor);
+        codeEditor = insertEditor(filename);
+        openFile = new QFile(filename, codeEditor);
+    } else {
+        codeEditor = insertEditor(QFileInfo(*openFile).absoluteFilePath());
+    }
     
     if (openFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream stream(openFile);
@@ -178,6 +183,7 @@ void EditorStack::open() {
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Unable to read the specified file."));
         codeEditor->location = "";
+        closeTab();
     }
     delete openFile;
 }
