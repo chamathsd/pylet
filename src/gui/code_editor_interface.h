@@ -39,12 +39,12 @@ private:
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     PythonHighlighter* highlighter;
 
-private slots:
+private Q_SLOTS:
     void updateLineNumbersWidth(int newBlockCount);
     void updateLineNumbersArea(const QRect &, int);
     void highlightCurrentLine();
 
-public slots:
+public Q_SLOTS:
     void zoomInSlot();
     void zoomOutSlot();
     void resetZoom(int zoom = 12);

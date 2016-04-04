@@ -32,7 +32,7 @@ private:
     QSettings *s;
     QRect screenRect;
 
-private slots:
+private Q_SLOTS:
     void updateWindowTitle(int index = -1);
 };
 

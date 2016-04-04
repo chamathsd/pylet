@@ -10,6 +10,7 @@ endif()
 
 project(pylet)
 
+add_definitions(-DQT_NO_KEYWORDS)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)

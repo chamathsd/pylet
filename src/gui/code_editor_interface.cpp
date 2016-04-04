@@ -146,7 +146,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
              *       Handle paranthetical parameter indentation.
              */
 
-            foreach(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats()) {
+            Q_FOREACH(QTextLayout::FormatRange r, textCursor().block().layout()->additionalFormats()) {
                 if (r.format == highlighter->normalFormat) {
                     colonSearch.append(currentBlock.mid(r.start, r.length));
                 }
@@ -163,7 +163,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
                 }
             } else if (returnSearch.contains(QRegExp("return"))) {
                 unsigned int tabOver = 0;
-                foreach(QChar c, whitespace) {
+                Q_FOREACH(QChar c, whitespace) {
                     if (c == ' ') {
                         tabOver += 1;
                     }

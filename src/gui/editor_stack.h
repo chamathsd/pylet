@@ -28,12 +28,12 @@ private:
     bool saveQueued = false;
     int globalZoom = 12;
 
-private slots:
+private Q_SLOTS:
     void manageFocus();
     void flagAsModified(bool);
     void manageExternalModification();
 
-public slots:
+public Q_SLOTS:
     CodeEditor* insertEditor(const QString &filePath = "");
     void open();
     void save(int index = -1, bool forceSave = false);
