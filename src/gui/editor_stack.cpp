@@ -265,6 +265,15 @@ void EditorStack::closeTab(int index, bool forceClose) {
         insertEditor();
 }
 
+void EditorStack::closeAll() {
+    while (count() != 1) {
+        closeTab();
+    }
+    // Close last tab manually since it will re-insert the default editor.
+    closeTab();
+}
+
+
 void EditorStack::run() {
     if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
         if (c->filename != "") {

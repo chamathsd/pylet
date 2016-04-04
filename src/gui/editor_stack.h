@@ -39,6 +39,7 @@ public slots:
     int saveAs();
     void saveAll();
     void closeTab(int index = -1, bool forceClose = false);
+    void closeAll();
     void run();
     void undo();
     void redo();
