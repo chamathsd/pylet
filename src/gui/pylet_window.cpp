@@ -99,6 +99,9 @@ void PyletWindow::initWidgets() {
     QAction* saveAll = new QAction("Save All", this); actions << saveAll;
     connect(saveAll, SIGNAL(triggered()), editorStack, SLOT(saveAll()));
 
+    QAction* close = new QAction("Close", this); actions << close;
+    connect(close, SIGNAL(triggered()), editorStack, SLOT(closeTab()));
+
     QAction* undo = new QAction("Undo", this); actions << undo;
     connect(undo, SIGNAL(triggered()), editorStack, SLOT(undo()));
 
@@ -151,6 +154,8 @@ void PyletWindow::initWidgets() {
         fileMenu->addAction(save);
         fileMenu->addAction(saveAs);
         fileMenu->addAction(saveAll);
+        fileMenu->addSeparator();
+        fileMenu->addAction(close);
     QMenu *editMenu = menuBar()->addMenu("Edit");
         editMenu->addAction(undo);
         editMenu->addAction(redo);
@@ -176,6 +181,7 @@ void PyletWindow::initWidgets() {
     QPixmap newIcon(":/pylet_icons/icons/new-file.png"),
             saveIcon(":/pylet_icons/icons/save.png"),
             saveAllIcon(":/pylet_icons/icons/save-all.png"),
+            closeIcon(":/pylet_icons/icons/close-file.png"),
             runIcon(":/pylet_icons/icons/run.png"),
             cutIcon(":/pylet_icons/icons/cut.png"),
             copyIcon(":/pylet_icons/icons/copy.png"),
@@ -188,6 +194,7 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
     toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));
     toolBar->addAction(QIcon(saveAllIcon), "Save All", editorStack, SLOT(saveAll()));
+    toolBar->addAction(QIcon(closeIcon), "Close File", editorStack, SLOT(closeTab()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(runIcon), "Run File", editorStack, SLOT(run()));
     toolBar->addSeparator();

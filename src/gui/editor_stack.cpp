@@ -97,46 +97,6 @@ int EditorStack::generateUntrackedID() {
     return id;
 }
 
-void EditorStack::closeTab(int index, bool forceClose) {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(widget(index))) {
-        if (forceClose) {
-            c->deleteLater();
-        } else {
-            bool isUntracked = c->filename == "";
-            if (c->document()->isModified()) {
-                setCurrentWidget(c);
-                QString filename;
-                if (!isUntracked) {
-                    filename = c->location;
-                } else {
-                    filename = "untitled" + QString::number(c->untrackedID) + ".py";
-                }
-                QMessageBox::StandardButton saveQuery;
-                saveQuery = QMessageBox::question(this, "Save", "Save file \"" + filename + "\"?",
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-                if (saveQuery == QMessageBox::Cancel) {
-                    return;
-                } else {
-                    if (isUntracked)
-                        untrackedFiles.remove(c->untrackedID);
-                    if (saveQuery == QMessageBox::Yes) {
-                        save();
-                    } else {
-                        c->deleteLater();
-                    }
-                }
-            } else {
-                if (isUntracked)
-                    untrackedFiles.remove(c->untrackedID);
-                c->deleteLater();
-            }
-        }
-    }
-    removeTab(index);
-    if (count() == 0)
-        insertEditor();
-}
-
 void EditorStack::manageFocus() {
     if (qApp->applicationState() == Qt::ApplicationActive) {
         for (int index = 0; index < count(); ++index) {
@@ -261,6 +221,48 @@ void EditorStack::saveAll() {
     for (int index = 0; index < count(); ++index) {
         save(index);
     }
+}
+
+void EditorStack::closeTab(int index, bool forceClose) {
+    if (index == -1)
+        index = indexOf(currentWidget());
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(widget(index))) {
+        if (forceClose) {
+            c->deleteLater();
+        } else {
+            bool isUntracked = c->filename == "";
+            if (c->document()->isModified()) {
+                setCurrentWidget(c);
+                QString filename;
+                if (!isUntracked) {
+                    filename = c->location;
+                } else {
+                    filename = "untitled" + QString::number(c->untrackedID) + ".py";
+                }
+                QMessageBox::StandardButton saveQuery;
+                saveQuery = QMessageBox::question(this, "Save", "Save file \"" + filename + "\"?",
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+                if (saveQuery == QMessageBox::Cancel) {
+                    return;
+                } else {
+                    if (isUntracked)
+                        untrackedFiles.remove(c->untrackedID);
+                    if (saveQuery == QMessageBox::Yes) {
+                        save();
+                    } else {
+                        c->deleteLater();
+                    }
+                }
+            } else {
+                if (isUntracked)
+                    untrackedFiles.remove(c->untrackedID);
+                c->deleteLater();
+            }
+        }
+    }
+    removeTab(index);
+    if (count() == 0)
+        insertEditor();
 }
 
 void EditorStack::run() {

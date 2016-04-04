@@ -29,7 +29,6 @@ private:
     int globalZoom = 12;
 
 private slots:
-    void closeTab(int index, bool forceClose = false);
     void manageFocus();
     void flagAsModified(bool);
     void manageExternalModification();
@@ -39,6 +38,7 @@ public slots:
     void save(int index = -1, bool forceSave = false);
     int saveAs();
     void saveAll();
+    void closeTab(int index = -1, bool forceClose = false);
     void run();
     void undo();
     void redo();
