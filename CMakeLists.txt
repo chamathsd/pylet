@@ -31,6 +31,8 @@ set(GUI_SOURCE
     src/gui/editor_stack.h
     src/gui/console.cpp
     src/gui/console.h
+    src/gui/info_box.cpp
+    src/gui/info_box.h
 )
 
 set(PYTHON_SOURCE

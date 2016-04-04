@@ -4,6 +4,7 @@
 */
 
 #include "pylet_window.h"
+#include "info_box.h"
 #include <boost/python.hpp>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
@@ -72,10 +73,7 @@ void PyletWindow::initWidgets() {
     connect(fileTree, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(openFromFileTree(const QModelIndex &)));
     navLayout->addWidget(fileTree, 3);
 
-    QLabel* infoBox = new QLabel(navigator);
-    infoBox->setStyleSheet("background-color: green; color: white; font-size: 40px;");
-    infoBox->setAlignment(Qt::AlignCenter);
-    infoBox->setText("Info Box");
+    InfoBox* infoBox = new InfoBox(coreWidget);
     navLayout->addWidget(infoBox, 1);
 
     editorStack = new EditorStack(s, coreWidget);
@@ -87,7 +85,7 @@ void PyletWindow::initWidgets() {
     QWidget* consoleFrame = new QWidget(coreWidget);
     QVBoxLayout* consoleLayout = new QVBoxLayout(consoleFrame);
     consoleFrame->setLayout(consoleLayout);
-    console = new Console(coreWidget);
+    console = new Console(infoBox, coreWidget);
     console->setMinimumWidth(280);
     consoleLayout->addWidget(console);
     QHBoxLayout* shellLayout = new QHBoxLayout(consoleFrame);
@@ -289,7 +287,6 @@ void PyletWindow::updateFileTree() {
             fileTree->setRootIndex(model->index(QFileInfo(checkFile).absolutePath()));
             model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
         } else {
-            qDebug() << "Triggered";
             fileTree->setModel(blank);
         }
     }
@@ -312,6 +309,8 @@ void PyletWindow::parseConsoleString() {
 }
 
 void PyletWindow::finalizeRuntime() {
+    // Clean up all resources from previous Python runtime
     Py_Finalize();
+
     noRuntime = true;
 }
