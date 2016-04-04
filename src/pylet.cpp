@@ -85,6 +85,7 @@ static void g_initSettings(const QApplication &application) {
         config.beginGroup("Shortcuts");
 
         config.setValue("New", QKeySequence(Qt::CTRL + Qt::Key_N));
+        config.setValue("Open", QKeySequence(Qt::CTRL + Qt::Key_O));
         config.setValue("Save", QKeySequence(Qt::CTRL + Qt::Key_S));
         config.setValue("Save As...", QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S));
         config.setValue("Save All", QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));

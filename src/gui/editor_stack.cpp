@@ -138,19 +138,47 @@ void EditorStack::manageExternalModification() {
     }
 }
 
-void EditorStack::insertEditor(const QString &filePath) {
+CodeEditor* EditorStack::insertEditor(const QString &filePath) {
     CodeEditor* codeEditor = new CodeEditor(settingsPtr, this, filePath);
 
-    int fileID = generateUntrackedID();
-    addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
-    untrackedFiles.insert(fileID, codeEditor);
-    codeEditor->untrackedID = fileID;
+    if (filePath == "") {
+        int fileID = generateUntrackedID();
+        addTab(codeEditor, "untitled" + QString::number(fileID) + ".py");
+        untrackedFiles.insert(fileID, codeEditor);
+        codeEditor->untrackedID = fileID;
+    } else {
+        addTab(codeEditor, "");
+    }
 
     connect(codeEditor, SIGNAL(modificationChanged(bool)),
         this, SLOT(flagAsModified(bool)));
 
     codeEditor->resetZoom(globalZoom);
     setCurrentWidget(codeEditor);
+    return codeEditor;
+}
+
+void EditorStack::open() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+        "Python files (*.py *.pyw);;Text files (*.txt);;All files (*.*)");
+    if (filename == "")
+        return;
+
+    CodeEditor* codeEditor = insertEditor(filename);
+    QFile* openFile = new QFile(filename, codeEditor);
+    
+    if (openFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream stream(openFile);
+        codeEditor->setPlainText(stream.readAll());
+        codeEditor->filename = QFileInfo(*openFile).fileName();
+        setTabText(indexOf(codeEditor), codeEditor->filename);
+        codeEditor->document()->setModified(false);
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Unable to read the specified file."));
+        codeEditor->location = "";
+    }
+    delete openFile;
 }
 
 /*

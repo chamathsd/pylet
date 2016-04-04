@@ -34,7 +34,8 @@ private slots:
     void manageExternalModification();
 
 public slots:
-    void insertEditor(const QString &filePath = "");
+    CodeEditor* insertEditor(const QString &filePath = "");
+    void open();
     void save(int index = -1, bool forceSave = false);
     int saveAs();
     void saveAll();

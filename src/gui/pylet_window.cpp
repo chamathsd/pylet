@@ -7,6 +7,7 @@
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
+#include <qtreewidget.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -90,6 +91,9 @@ void PyletWindow::initWidgets() {
     QAction* newFile = new QAction("New", this); actions << newFile;
     connect(newFile, SIGNAL(triggered()), editorStack, SLOT(insertEditor()));
 
+    QAction* open = new QAction("Open", this); actions << open;
+    connect(open, SIGNAL(triggered()), editorStack, SLOT(open()));
+
     QAction* save = new QAction("Save", this); actions << save;
     connect(save, SIGNAL(triggered()), editorStack, SLOT(save()));
 
@@ -154,6 +158,8 @@ void PyletWindow::initWidgets() {
     QMenu *fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(newFile);
         fileMenu->addSeparator();
+        fileMenu->addAction(open);
+        fileMenu->addSeparator();
         fileMenu->addAction(save);
         fileMenu->addAction(saveAs);
         fileMenu->addAction(saveAll);
@@ -183,6 +189,7 @@ void PyletWindow::initWidgets() {
     toolBar = addToolBar("Action Bar");
     
     QPixmap newIcon(":/pylet_icons/icons/new-file.png"),
+            openIcon(":/pylet_icons/icons/open-file.png"),
             saveIcon(":/pylet_icons/icons/save.png"),
             saveAllIcon(":/pylet_icons/icons/save-all.png"),
             closeIcon(":/pylet_icons/icons/close-file.png"),
@@ -197,6 +204,7 @@ void PyletWindow::initWidgets() {
             zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
             zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
     toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
+    toolBar->addAction(QIcon(openIcon), "Open File", editorStack, SLOT(open()));
     toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));
     toolBar->addAction(QIcon(saveAllIcon), "Save All", editorStack, SLOT(saveAll()));
     toolBar->addAction(QIcon(closeIcon), "Close File", editorStack, SLOT(closeTab()));
