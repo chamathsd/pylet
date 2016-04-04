@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
 
     PyletWindow w;
 
+    QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(finalizeRuntime()));
+
     return app.exec();
 }
 

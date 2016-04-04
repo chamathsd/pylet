@@ -26,9 +26,10 @@ public:
 private:
     void initWindow();
     void initWidgets();
-    CodeEditor *codeEditor;
-    EditorStack *editorStack;
-    Console *console;
+    CodeEditor* codeEditor;
+    EditorStack* editorStack;
+    Console* console;
+    QLineEdit* shell;
     QFileSystemModel* model;
     QFileSystemModel* blank = new QFileSystemModel(this);
     QTreeView* fileTree;
@@ -36,11 +37,16 @@ private:
     QToolBar *toolBar;
     QSettings *s;
     QRect screenRect;
+    bool noRuntime = true;
 
 private Q_SLOTS:
     void updateWindowTitle(int index = -1);
     void updateFileTree();
     void openFromFileTree(const QModelIndex&);
+    void parseConsoleString();
+
+public Q_SLOTS:
+    void finalizeRuntime();
 };
 
 #endif // PYLET_WINDOW_H

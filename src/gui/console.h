@@ -14,6 +14,7 @@ class Console : public QPlainTextEdit {
 public:
     Console(QWidget *parent = 0);
     void runFile(const QString &filename);
+    void parseString(const QString &inputString);
     void throwError(const QString &message);
 
 private:

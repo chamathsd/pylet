@@ -4,9 +4,11 @@
 */
 
 #include "pylet_window.h"
+#include <boost/python.hpp>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
+#include <qlineedit.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -81,11 +83,29 @@ void PyletWindow::initWidgets() {
     coreWidget->insertWidget(1, editorStack);
 
     editorStack->insertEditor();
-    // codeEditor->setMinimumWidth(280);
-
+    
+    QWidget* consoleFrame = new QWidget(coreWidget);
+    QVBoxLayout* consoleLayout = new QVBoxLayout(consoleFrame);
+    consoleFrame->setLayout(consoleLayout);
     console = new Console(coreWidget);
     console->setMinimumWidth(280);
-    coreWidget->insertWidget(2, console);
+    consoleLayout->addWidget(console);
+    QHBoxLayout* shellLayout = new QHBoxLayout(consoleFrame);
+    QLabel* prompt = new QLabel(consoleFrame);
+    prompt->setText(">>>");
+    prompt->setMaximumWidth(30);
+    shellLayout->addWidget(prompt);
+    shell = new QLineEdit(coreWidget);
+    QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
+    shell->setFont(monoFont);
+    shell->setMinimumHeight(30);
+    shell->setMaximumHeight(30);
+    shellLayout->addWidget(shell);
+    consoleLayout->addLayout(shellLayout);
+
+    connect(shell, SIGNAL(returnPressed()), this, SLOT(parseConsoleString()));
+    
+    coreWidget->insertWidget(2, consoleFrame);
     editorStack->console = console;
 
     coreWidget->setStretchFactor(0, 2);
@@ -223,7 +243,7 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(closeAllIcon), "Close All", editorStack, SLOT(closeAll()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(runIcon), "Run File", editorStack, SLOT(run()));
-    toolBar->addAction(QIcon(interruptIcon), "Interrupt Execution", editorStack, SLOT(run()));
+    toolBar->addAction(QIcon(interruptIcon), "Interrupt Execution", this, SLOT(finalizeRuntime()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(cutIcon), "Cut", editorStack, SLOT(cut()));
     toolBar->addAction(QIcon(copyIcon), "Copy", editorStack, SLOT(copy()));
@@ -280,4 +300,18 @@ void PyletWindow::openFromFileTree(const QModelIndex &index) {
     if (QFileInfo(*openFile).isFile()) {
         editorStack->open(openFile);
     }
+}
+
+void PyletWindow::parseConsoleString() {
+    if (noRuntime) {
+        editorStack->run();
+        noRuntime = false;
+    }
+    console->parseString(shell->text());
+    shell->clear();
+}
+
+void PyletWindow::finalizeRuntime() {
+    Py_Finalize();
+    noRuntime = true;
 }

@@ -138,6 +138,9 @@ namespace emb {
 std::string parsePyFile(const std::string &filename) {
     using namespace boost::python;
 
+    // Clean up all resources from previous Python runtime
+    Py_Finalize();
+    
     PyImport_AppendInittab("emb", emb::PyInit_emb);
     Py_Initialize();
     PyObject* embModule = PyImport_ImportModule("emb");
@@ -161,7 +164,22 @@ std::string parsePyFile(const std::string &filename) {
             PyRun_SimpleFileEx(file, filename.c_str(), 1);
         }
     }
-    Py_Finalize();
+
+    return buffer;
+}
+
+std::string parsePyString(const std::string &inputString) {
+    using namespace boost::python;
+
+    PyImport_AppendInittab("emb", emb::PyInit_emb);
+    PyObject* embModule = PyImport_ImportModule("emb");
+    std::string buffer;
+    {
+        emb::stdout_write_type write =
+            [&buffer](std::string s) { buffer += s; };
+        emb::set_stdout(write);
+        PyRun_SimpleString(inputString.c_str());
+    }
 
     return buffer;
 }

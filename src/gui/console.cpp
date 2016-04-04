@@ -22,6 +22,14 @@ void Console::runFile(const QString &filename) {
     ensureCursorVisible();
 }
 
+void Console::parseString(const QString &inputString) {
+    moveCursor(QTextCursor::End);
+    std::string pyString = inputString.toStdString();
+    QString readOut = QString::fromStdString(parsePyString(pyString));
+    textCursor().insertText(readOut);
+    ensureCursorVisible();
+}
+
 void Console::throwError(const QString &message) {
     QString htmlString = "<font color = \"red\">[Pylet] " + message + "</font>";
     appendHtml(htmlString);
