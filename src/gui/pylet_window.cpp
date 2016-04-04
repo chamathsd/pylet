@@ -195,6 +195,7 @@ void PyletWindow::initWidgets() {
             closeIcon(":/pylet_icons/icons/close-file.png"),
             closeAllIcon(":/pylet_icons/icons/close-all.png"),
             runIcon(":/pylet_icons/icons/run.png"),
+            interruptIcon(":/pylet_icons/icons/interrupt.png"),
             cutIcon(":/pylet_icons/icons/cut.png"),
             copyIcon(":/pylet_icons/icons/copy.png"),
             pasteIcon(":/pylet_icons/icons/paste.png"),
@@ -202,7 +203,8 @@ void PyletWindow::initWidgets() {
             redoIcon(":/pylet_icons/icons/redo.png"),
             zoomInIcon(":/pylet_icons/icons/zoom-in.png"),
             zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
-            zoomResetIcon(":/pylet_icons/icons/zoom-fit.png");
+            zoomResetIcon(":/pylet_icons/icons/zoom-fit.png"),
+            settingsIcon(":/pylet_icons/icons/settings.png");
     toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
     toolBar->addAction(QIcon(openIcon), "Open File", editorStack, SLOT(open()));
     toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));
@@ -211,6 +213,7 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(closeAllIcon), "Close All", editorStack, SLOT(closeAll()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(runIcon), "Run File", editorStack, SLOT(run()));
+    toolBar->addAction(QIcon(interruptIcon), "Interrupt Execution", editorStack, SLOT(run()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(cutIcon), "Cut", editorStack, SLOT(cut()));
     toolBar->addAction(QIcon(copyIcon), "Copy", editorStack, SLOT(copy()));
@@ -222,6 +225,8 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(zoomInIcon), "Zoom In", editorStack, SLOT(zoomIn()));
     toolBar->addAction(QIcon(zoomOutIcon), "Zoom Out", editorStack, SLOT(zoomOut()));
     toolBar->addAction(QIcon(zoomResetIcon), "Reset Zoom", editorStack, SLOT(resetZoom()));
+    toolBar->addSeparator();
+    toolBar->addAction(QIcon(settingsIcon), "Settings", editorStack, SLOT(run()));
 
     statusBar();
 }
