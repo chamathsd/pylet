@@ -33,7 +33,6 @@ private:
     QRect screenRect;
 
 private slots:
-    void run();
     void updateWindowTitle(int index = -1);
 };
 

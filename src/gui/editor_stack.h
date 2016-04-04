@@ -7,6 +7,7 @@
 #define EDITOR_STACK_H
 
 #include "code_editor_interface.h"
+#include "console.h"
 #include <qtabwidget.h>
 
 class EditorStack : public QTabWidget {
@@ -15,6 +16,7 @@ class EditorStack : public QTabWidget {
 public:
     EditorStack(QSettings* s, QWidget *parent);
     CodeEditor* currentEditor();
+    Console* console;
 
 private:
     void fileStream(CodeEditor* c, QFile* saveFile);
@@ -37,6 +39,7 @@ public slots:
     void save(int index = -1, bool forceSave = false);
     int saveAs();
     void saveAll();
+    void run();
     void undo();
     void redo();
     void cut();

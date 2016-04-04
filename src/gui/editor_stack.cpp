@@ -5,6 +5,7 @@
 
 #include "editor_stack.h"
 #include <qfilesystemwatcher.h>
+#include <qtemporaryfile.h>
 #include <qstandardpaths.h>
 #include <qapplication.h>
 #include <qmessagebox.h>
@@ -12,7 +13,7 @@
 #include <qpainter.h>
 #include <qdebug.h>
 
-EditorStack::EditorStack(QSettings* s, QWidget *parent) : 
+EditorStack::EditorStack(QSettings* s, QWidget *parent) :
     settingsPtr(s), 
     QTabWidget(parent) {
 
@@ -259,6 +260,29 @@ int EditorStack::saveAs() {
 void EditorStack::saveAll() {
     for (int index = 0; index < count(); ++index) {
         save(index);
+    }
+}
+
+void EditorStack::run() {
+    if (CodeEditor* c = qobject_cast<CodeEditor*>(currentWidget())) {
+        if (c->filename != "") {
+            save();
+
+            QFile execFile(c->location);
+            console->runFile(execFile.fileName());
+        } else {
+            QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", c);
+
+            tempFile.open();
+            QTextStream out(&tempFile);
+            out << c->toPlainText() << endl;
+            tempFile.close();
+
+            console->runFile(tempFile.fileName());
+            tempFile.remove();
+        }
+    } else {
+        console->throwError("No active files to run.");
     }
 }
 

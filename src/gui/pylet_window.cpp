@@ -76,6 +76,7 @@ void PyletWindow::initWidgets() {
     console = new Console(coreWidget);
     console->setMinimumWidth(280);
     coreWidget->insertWidget(2, console);
+    editorStack->console = console;
 
     coreWidget->setStretchFactor(0, 1);
     coreWidget->setStretchFactor(1, 5);
@@ -117,7 +118,7 @@ void PyletWindow::initWidgets() {
     connect(selectAll, SIGNAL(triggered()), editorStack, SLOT(selectAll()));
 
     QAction* run = new QAction("Run", this); actions << run;
-    connect(run, SIGNAL(triggered()), this, SLOT(run()));
+    connect(run, SIGNAL(triggered()), editorStack, SLOT(run()));
 
     QAction* zoomIn = new QAction("Zoom In", this); actions << zoomIn;
     connect(zoomIn, SIGNAL(triggered()), editorStack, SLOT(zoomIn()));
@@ -188,7 +189,7 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));
     toolBar->addAction(QIcon(saveAllIcon), "Save All", editorStack, SLOT(saveAll()));
     toolBar->addSeparator();
-    toolBar->addAction(QIcon(runIcon), "Run File", this, SLOT(run()));
+    toolBar->addAction(QIcon(runIcon), "Run File", editorStack, SLOT(run()));
     toolBar->addSeparator();
     toolBar->addAction(QIcon(cutIcon), "Cut", editorStack, SLOT(cut()));
     toolBar->addAction(QIcon(copyIcon), "Copy", editorStack, SLOT(copy()));
@@ -202,22 +203,6 @@ void PyletWindow::initWidgets() {
     toolBar->addAction(QIcon(zoomResetIcon), "Reset Zoom", editorStack, SLOT(resetZoom()));
 
     statusBar();
-}
-
-void PyletWindow::run() {
-    if (CodeEditor* c = qobject_cast<CodeEditor*>(editorStack->currentWidget())) {
-        QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", c);
-
-        tempFile.open();
-        QTextStream out(&tempFile);
-        out << c->toPlainText() << endl;
-        tempFile.close();
-
-        console->runFile(tempFile.fileName());
-        tempFile.remove();
-    } else {
-        console->throwError("No active files to run.");
-    }
 }
 
 void PyletWindow::updateWindowTitle(int index) {
