@@ -15,6 +15,10 @@ static void g_initSettings(const QApplication &application);
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+#ifndef _WIN32
+    // Set fusion style on Unix systems for conformity
+    app.setStyle("fusion");
+#endif
     g_initSettings(app);
     app.setCursorFlashTime(800);
 
