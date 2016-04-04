@@ -5,9 +5,10 @@
 
 #include "pylet_window.h"
 #include <qapplication.h>
+#include <qfilesystemmodel.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
-#include <qtreewidget.h>
+#include <qtreeview.h>
 #include <qmenubar.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -59,7 +60,13 @@ void PyletWindow::initWidgets() {
     crawler->setStyleSheet("background-color: red; color: white; font-size: 40px;");
     crawler->setAlignment(Qt::AlignCenter);
     crawler->setText("File Crawler");
-    navLayout->addWidget(crawler, 3);
+
+    QFileSystemModel* model = new QFileSystemModel(this);
+    QTreeView* fileTree = new QTreeView(navigator);
+    fileTree->setModel(model);
+    fileTree->setRootIndex(model->index("C:\\"));
+    fileTree->setStyleSheet("background-color: beige;");
+    navLayout->addWidget(fileTree, 3);
 
     QLabel* infoBox = new QLabel(navigator);
     infoBox->setStyleSheet("background-color: green; color: white; font-size: 40px;");

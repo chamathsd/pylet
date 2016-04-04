@@ -150,6 +150,7 @@ CodeEditor* EditorStack::insertEditor(const QString &filePath) {
         addTab(codeEditor, "");
     }
 
+    qDebug() << "Code editor location is:" << codeEditor->location;
     connect(codeEditor, SIGNAL(modificationChanged(bool)),
         this, SLOT(flagAsModified(bool)));
 
