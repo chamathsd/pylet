@@ -300,9 +300,9 @@ void PyletWindow::openFromFileTree(const QModelIndex &index) {
 }
 
 void PyletWindow::parseConsoleString() {
-    if (noRuntime) {
+    if (console->noRuntime) {
         editorStack->run();
-        noRuntime = false;
+        console->noRuntime = false;
     }
     console->parseString(shell->text());
     shell->clear();
@@ -312,5 +312,5 @@ void PyletWindow::finalizeRuntime() {
     // Clean up all resources from previous Python runtime
     Py_Finalize();
 
-    noRuntime = true;
+    console->noRuntime = true;
 }

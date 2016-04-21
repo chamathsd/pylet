@@ -159,10 +159,16 @@ std::string parsePyFile(const std::string &filename) {
         PyRun_SimpleString("import sys");
         PyRun_SimpleString("sys.stderr = sys.stdout");
 
+        char *argv[1];
+        argv[0] = const_cast<char*>(filename.c_str());
+        PySys_SetArgv(1, (wchar_t **)argv);
+
         FILE* file = _Py_fopen(filename.c_str(), "r+");
         if (file != NULL) {
             PyRun_SimpleFileEx(file, filename.c_str(), 1);
         }
+
+        PyRun_SimpleString("import sys; sys.path.pop(0)\n");
     }
 
     return buffer;

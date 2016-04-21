@@ -325,8 +325,10 @@ void EditorStack::run() {
             tempFile.close();
 
             console->runFile(tempFile.fileName());
+            qDebug() << tempFile.fileName();
             tempFile.remove();
         }
+        console->noRuntime = false;
     } else {
         console->throwError("No active files to run.");
     }

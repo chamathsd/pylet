@@ -18,10 +18,12 @@ public:
     void parseString(const QString &inputString);
     void interpretError(const QString &checkString);
     void throwError(const QString &message);
+    bool noRuntime = true;
 
 private:
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     QString generateRestartString();
+    
     InfoBox* i;
 };
 

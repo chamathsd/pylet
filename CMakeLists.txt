@@ -64,7 +64,7 @@ else()
     MESSAGE(FATAL_ERROR "Target OS not recognized or supported, aborting CMake process.")
 endif()
 
-set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_STATIC_LIBS       OFF)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 

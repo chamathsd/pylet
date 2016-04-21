@@ -37,7 +37,6 @@ private:
     QToolBar *toolBar;
     QSettings *s;
     QRect screenRect;
-    bool noRuntime = true;
 
 private Q_SLOTS:
     void updateWindowTitle(int index = -1);
