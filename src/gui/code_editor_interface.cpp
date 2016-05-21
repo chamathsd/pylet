@@ -31,7 +31,8 @@ CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath) :
     }
 
     setFont(monoFont);
-    setWordWrapMode(QTextOption::NoWrap);
+    setWordWrapMode(QTextOption::WordWrap);
+    //setWordWrapMode(QTextOption::NoWrap);
     setTabStopWidth(tabSpacing * fontMetrics().width(' '));
 
     /* Syntax highlighter for Python documents */

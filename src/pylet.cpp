@@ -4,28 +4,60 @@
 */
 
 #include "gui/pylet_window.h"
+#include "python/qpyconsole.h"
 #include <qapplication.h>
 #include <qmessagebox.h>
 #include <qsettings.h>
 #include <sstream>
 #include <iostream>
 
+/* Define the following to fix __ctype_* from GLIBC2.3 and upper
+if not compiled using the same GLIBC */
+//#define FIX__CTYPE_
+
+#ifdef FIX__CTYPE_
+#include <ctype.h>
+__const unsigned short int *__ctype_b;
+__const __int32_t *__ctype_tolower;
+__const __int32_t *__ctype_toupper;
+
+void ctSetup() {
+    __ctype_b = *(__ctype_b_loc());
+    __ctype_toupper = *(__ctype_toupper_loc());
+    __ctype_tolower = *(__ctype_tolower_loc());
+}
+#endif
+
 /* Entry point initialization - mostly runtime QSettings */
 static void g_initSettings(const QApplication &application);
 
+//#define PYCONSOLE
+
 int main(int argc, char *argv[]) {
+#ifdef FIX__CTYPE_
+    ctSetup();
+#endif
     QApplication app(argc, argv);
 #ifndef _WIN32
     // Set fusion style on Unix systems for conformity
     app.setStyle("fusion");
 #endif
+
+#ifndef PYCONSOLE
     g_initSettings(app);
     app.setCursorFlashTime(800);
 
     PyletWindow w;
 
     QObject::connect(&app, SIGNAL(aboutToQuit()), &w, SLOT(finalizeRuntime()));
-
+#else
+    QMainWindow mw;
+    mw.setMinimumSize(640, 480);
+    QPyConsole *console = QPyConsole::getInstance(&mw);
+    mw.setFocusProxy((QWidget*)console);
+    mw.setCentralWidget((QWidget*)console);
+    mw.show();
+#endif
     return app.exec();
 }
 

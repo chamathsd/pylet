@@ -12,6 +12,7 @@ project(pylet)
 
 add_definitions(-DQT_NO_KEYWORDS)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(Python_ADDITIONAL_VERSIONS 3.4)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
@@ -29,8 +30,6 @@ set(GUI_SOURCE
     src/gui/code_editor_highlighter.h
     src/gui/editor_stack.cpp
     src/gui/editor_stack.h
-    src/gui/console.cpp
-    src/gui/console.h
     src/gui/info_box.cpp
     src/gui/info_box.h
 )
@@ -38,6 +37,10 @@ set(GUI_SOURCE
 set(PYTHON_SOURCE
     src/python/buffer.cpp
     src/python/buffer.h
+    src/python/qconsole.cpp
+    src/python/qconsole.h
+    src/python/qpyconsole.cpp
+    src/python/qpyconsole.h
 )
 
 set(SOURCE
@@ -54,7 +57,7 @@ set(RESOURCES
 set(GUI_TYPE "")
 
 if(WIN32)
-    # set(GUI_TYPE WIN32)
+    set(GUI_TYPE WIN32)
 elseif(UNIX)
     if(APPLE)
         set(GUI_TYPE MACOSX_BUNDLE)
@@ -104,6 +107,10 @@ if(MSVC)
     source_group("src\\" FILES ${CORE_SOURCE})
     source_group("src\\gui" FILES ${GUI_SOURCE})
     source_group("src\\python" FILES ${PYTHON_SOURCE})
+
+    set(WIN_LINKFLAGS \"${CMAKE_CURRENT_SOURCE_DIR}/res/app_icon.res\")
+    set_target_properties(pylet PROPERTIES LINK_FLAGS ${WIN_LINKFLAGS})
+    set_target_properties(pylet PROPERTIES COMPILE_FLAGS "/EHsc")
 endif()
 
 # --- RUNTIME DEPENDENCIES ---

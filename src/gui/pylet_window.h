@@ -42,7 +42,6 @@ private Q_SLOTS:
     void updateWindowTitle(int index = -1);
     void updateFileTree();
     void openFromFileTree(const QModelIndex&);
-    void parseConsoleString();
 
 public Q_SLOTS:
     void finalizeRuntime();

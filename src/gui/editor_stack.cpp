@@ -315,7 +315,7 @@ void EditorStack::run() {
             save();
 
             QFile execFile(c->location);
-            console->runFile(execFile.fileName());
+            pyConsole->runFile(execFile.fileName().toStdString());
         } else {
             QTemporaryFile tempFile(QDir::tempPath() + "-pyrun-XXXXXX.py", c);
 
@@ -324,13 +324,10 @@ void EditorStack::run() {
             out << c->toPlainText() << endl;
             tempFile.close();
 
-            console->runFile(tempFile.fileName());
+            pyConsole->runFile(tempFile.fileName().toStdString());
             qDebug() << tempFile.fileName();
             tempFile.remove();
         }
-        console->noRuntime = false;
-    } else {
-        console->throwError("No active files to run.");
     }
 }
 

@@ -4,6 +4,7 @@
 */
 
 #include "pylet_window.h"
+#include "src/python/qpyconsole.h"
 #include "info_box.h"
 #include <boost/python.hpp>
 #include <qapplication.h>
@@ -82,33 +83,22 @@ void PyletWindow::initWidgets() {
 
     editorStack->insertEditor();
     
-    QWidget* consoleFrame = new QWidget(coreWidget);
-    QVBoxLayout* consoleLayout = new QVBoxLayout(consoleFrame);
-    consoleFrame->setLayout(consoleLayout);
-    console = new Console(infoBox, coreWidget);
-    console->setMinimumWidth(280);
-    consoleLayout->addWidget(console);
-    QHBoxLayout* shellLayout = new QHBoxLayout(consoleFrame);
-    QLabel* prompt = new QLabel(consoleFrame);
-    prompt->setText(">>>");
-    prompt->setMaximumWidth(30);
-    shellLayout->addWidget(prompt);
-    shell = new QLineEdit(coreWidget);
+    QPyConsole* pyConsole = QPyConsole::getInstance(coreWidget, "Python 3.4.4 (v3.4.4:737efcadf5a6, Dec 20 2015, 19:28:18)"
+                                                                "[MSC v.1600 32 bit (Intel)] on win32\n"
+                                                                "Type 'copyright', 'credits' or 'license()' for more information.");
+    pyConsole->setMinimumWidth(280);
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
-    shell->setFont(monoFont);
-    shell->setMinimumHeight(30);
-    shell->setMaximumHeight(30);
-    shellLayout->addWidget(shell);
-    consoleLayout->addLayout(shellLayout);
+    pyConsole->setFont(monoFont);
+    pyConsole->setFocus();
 
-    connect(shell, SIGNAL(returnPressed()), this, SLOT(parseConsoleString()));
+    //connect(shell, SIGNAL(returnPressed()), this, SLOT(parseConsoleString()));
     
-    coreWidget->insertWidget(2, consoleFrame);
-    editorStack->console = console;
+    coreWidget->insertWidget(2, pyConsole);
+    editorStack->pyConsole = pyConsole;
 
     coreWidget->setStretchFactor(0, 2);
     coreWidget->setStretchFactor(1, 4);
-    coreWidget->setStretchFactor(2, 3);
+    coreWidget->setStretchFactor(2, 4);
 
     coreWidget->setMidLineWidth(8);
 
@@ -299,18 +289,7 @@ void PyletWindow::openFromFileTree(const QModelIndex &index) {
     }
 }
 
-void PyletWindow::parseConsoleString() {
-    if (console->noRuntime) {
-        editorStack->run();
-        console->noRuntime = false;
-    }
-    console->parseString(shell->text());
-    shell->clear();
-}
-
 void PyletWindow::finalizeRuntime() {
     // Clean up all resources from previous Python runtime
     Py_Finalize();
-
-    console->noRuntime = true;
 }

@@ -7,7 +7,7 @@
 #define EDITOR_STACK_H
 
 #include "code_editor_interface.h"
-#include "console.h"
+#include "src/python/qpyconsole.h"
 #include <qtabwidget.h>
 
 class EditorStack : public QTabWidget {
@@ -16,7 +16,7 @@ class EditorStack : public QTabWidget {
 public:
     EditorStack(QSettings* s, QWidget *parent);
     CodeEditor* currentEditor();
-    Console* console;
+    QPyConsole* pyConsole;
 
 private:
     void fileStream(CodeEditor* c, QFile* saveFile);
