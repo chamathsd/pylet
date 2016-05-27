@@ -5,6 +5,7 @@
 
 #include "gui/pylet_window.h"
 #include "python/qpyconsole.h"
+#include <qstandardpaths.h>
 #include <qapplication.h>
 #include <qmessagebox.h>
 #include <qsettings.h>
@@ -108,12 +109,14 @@ static void g_initFonts(const QApplication &application) {
 }
 
 static void g_initSettings(const QApplication &application) {
-    QString configFile = "config.ini";
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(appDataPath);
+    if (!dir.exists())
+        dir.mkpath(appDataPath);
+    QString configFile = dir.absolutePath() + "/config.ini";
     QSettings config(configFile, QSettings::IniFormat);
 
-    config.setPath(QSettings::IniFormat, QSettings::UserScope, application.applicationDirPath());
-
-    if (/* !QFile(configFile).exists() && */ config.isWritable()) {
+    if (!QFile(configFile).exists() && config.isWritable()) {
         config.beginGroup("Editor");
 
         config.setValue("iTabSpacing", 4);

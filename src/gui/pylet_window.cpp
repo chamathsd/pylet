@@ -7,6 +7,7 @@
 #include "src/python/qpyconsole.h"
 #include "info_box.h"
 #include <boost/python.hpp>
+#include <qstandardpaths.h>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #include <qtemporaryfile.h>
@@ -24,7 +25,7 @@ PyletWindow::PyletWindow(QWidget *parent) :
     QDesktopWidget *desktop = QApplication::desktop();
     screenRect = desktop->screen()->rect();
 
-    s = new QSettings("config.ini", QSettings::IniFormat);
+    s = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config.ini", QSettings::IniFormat);
 
     initWindow();
     initWidgets();
