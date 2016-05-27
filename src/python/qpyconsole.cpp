@@ -282,11 +282,12 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
     PyObject *module = PyImport_ImportModule("__main__");
     loc = glb = PyModule_GetDict(module);
 
-    PyImport_ImportModule("rlcompleter");
+    // NOTE: rlcompleter breaks initialization on Unix
+    //PyImport_ImportModule("rlcompleter");
     PyRun_SimpleString("import sys\n"
         "import redirector\n"
         "import console\n"
-        "import rlcompleter\n"
+        //"import rlcompleter\n"
         "sys.path.insert(0, \".\")\n" // add current
         // path
         "sys.stdout = redirector.redirector()\n"
@@ -298,7 +299,7 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
         "builtins.load=console.load\n"
         "builtins.history=console.history\n"
         "builtins.quit=console.quit\n"
-        "builtins.completer=rlcompleter.Completer()\n"
+        //"builtins.completer=rlcompleter.Completer()\n"
         );
 }
 

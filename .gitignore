@@ -51,3 +51,5 @@ Makefile*
 #misc
 *.py
 *.pyc
+*.DS_Store
+/.idea

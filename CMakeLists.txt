@@ -12,7 +12,7 @@ project(pylet)
 
 add_definitions(-DQT_NO_KEYWORDS)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(Python_ADDITIONAL_VERSIONS 3.4)
+set(Python_ADDITIONAL_VERSIONS 3.5)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
@@ -61,6 +61,9 @@ if(WIN32)
 elseif(UNIX)
     if(APPLE)
         set(GUI_TYPE MACOSX_BUNDLE)
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     endif(APPLE)
 else()
     # Suspend the configuration process if the target OS isn't recognized. 
@@ -75,7 +78,7 @@ find_package(PythonLibs 3 REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
-find_package(Boost COMPONENTS python REQUIRED)
+find_package(Boost COMPONENTS python3 REQUIRED)
 
 qt5_add_resources(UI_RESOURCES ${RESOURCES})
 
