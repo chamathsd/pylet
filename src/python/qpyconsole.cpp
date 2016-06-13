@@ -32,6 +32,8 @@
 //#endif
 #include "qpyconsole.h"
 
+#include <QCoreApplication>
+#include <QInputDialog>
 #include <QDebug>
 #include <fstream>
 
@@ -57,6 +59,10 @@ static PyObject* redirector_write(PyObject *, PyObject *args)
     }
     QString outputString = QString::fromLocal8Bit(output);
     resultString.append(outputString);
+    qApp->processEvents();
+    QPyConsole::getInstance()->setTextColor(QPyConsole::getInstance()->outColor_);
+    QPyConsole::getInstance()->insertPlainText(outputString);
+    QPyConsole::getInstance()->ensureCursorVisible();
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -72,23 +78,80 @@ static PyMethodDef redirectorMethods[] =
     {"__init__", redirector_init, METH_VARARGS,
      "initialize the stdout/err redirector"},
     {"write", redirector_write, METH_VARARGS,
-     "implement the write method to redirect stdout/err"},
+     "implement the write method to redirect stdout"},
      { "flush", redirector_flush, METH_VARARGS,
      "implement the flush method to redirect stdout/err" },
     {NULL,NULL,0,NULL},
 };
+
+static PyObject* err_init(PyObject *, PyObject *) {
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject* err_write(PyObject *, PyObject *args) {
+    char* output;
+    PyObject *selfi;
+
+    if (!PyArg_ParseTuple(args, "s", &output)) {
+        return NULL;
+    }
+    QString outputString = QString::fromLocal8Bit(output);
+    resultString.append(outputString);
+    qApp->processEvents();
+    QPyConsole::getInstance()->setTextColor(QPyConsole::getInstance()->errColor_);
+    QPyConsole::getInstance()->insertPlainText(outputString);
+    QPyConsole::getInstance()->ensureCursorVisible();
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject* err_flush(PyObject *, PyObject *args) {
+    resultString = "";
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef errMethods[] =
+{
+    { "__init__", err_init, METH_VARARGS,
+    "initialize the stdout/err redirector" },
+    { "write", err_write, METH_VARARGS,
+    "implement the write method to redirect stdout" },
+    { "flush", err_flush, METH_VARARGS,
+    "implement the flush method to redirect stdout/err" },
+    { NULL, NULL, 0, NULL },
+};
+
+static PyObject* py_input(PyObject *, PyObject *args) 
+{
+    char* output;
+
+    if (!PyArg_ParseTuple(args, "s", &output)) 
+    {
+        return NULL;
+    }
+    QString outputString = QString::fromLocal8Bit(output);
+    QString input = QInputDialog::getText(QPyConsole::getInstance(), QString("Input"), outputString);
+    PyObject* out = PyUnicode_FromString(input.toStdString().c_str());
+    qDebug() << QPyConsole::getInstance()->getCurrentCommand();
+    Py_INCREF(out);
+    return out;
+}
 
 static PyObject* py_clear(PyObject *, PyObject *)
 {
     QPyConsole::getInstance()->clear();
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     QPyConsole::getInstance()->setFont(monoFont);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_reset(PyObject *, PyObject *)
 {
     QPyConsole::getInstance()->reset();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -100,6 +163,7 @@ static PyObject* py_save(PyObject *, PyObject *args)
         return NULL;
     }
     QPyConsole::getInstance()->saveScript(filename);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -112,23 +176,27 @@ static PyObject* py_load(PyObject *, PyObject *args)
     }
     QPyConsole::getInstance()->loadScript(filename);
 
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_history(PyObject *, PyObject *)
 {
     QPyConsole::getInstance()->printHistory();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_quit(PyObject *, PyObject *)
 {
     resultString="Use reset() to restart the interpreter; otherwise exit your application\n";
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyMethodDef ModuleMethods[] = { {NULL,NULL,0,NULL} };
 static PyMethodDef console_methods[] =  {
+    {"input", py_input, METH_VARARGS, "gets input from the user" },
     {"clear",py_clear, METH_VARARGS,"clears the console"},
     {"reset",py_reset, METH_VARARGS,"reset the interpreter and clear the console"},
     {"save",py_save, METH_VARARGS,"save commands up to now in given file"},
@@ -142,6 +210,10 @@ static PyMethodDef console_methods[] =  {
 typedef struct {
     PyObject_HEAD
 } redirector_redirectorObject;
+
+typedef struct {
+    PyObject_HEAD
+} err_errObject;
 
 static PyTypeObject redirector_redirectorType = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -174,10 +246,50 @@ static PyTypeObject redirector_redirectorType = {
     redirectorMethods                    /* tp_methods */
 };
 
+static PyTypeObject err_errType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "err.err",             /* tp_name */
+    sizeof(err_errObject), /* tp_basicsize */
+    0,                                   /* tp_itemsize */
+    0,                                   /* tp_dealloc */
+    0,                                   /* tp_print */
+    0,                                   /* tp_getattr */
+    0,                                   /* tp_setattr */
+    0,                                   /* tp_reserved */
+    0,                                   /* tp_repr */
+    0,                                   /* tp_as_number */
+    0,                                   /* tp_as_sequence */
+    0,                                   /* tp_as_mapping */
+    0,                                   /* tp_hash  */
+    0,                                   /* tp_call */
+    0,                                   /* tp_str */
+    0,                                   /* tp_getattro */
+    0,                                   /* tp_setattro */
+    0,                                   /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                  /* tp_flags */
+    "",                                  /* tp_doc */
+    0,                                   /* tp_traverse */
+    0,                                   /* tp_clear */
+    0,                                   /* tp_richcompare */
+    0,                                   /* tp_weaklistoffset */
+    0,                                   /* tp_iter */
+    0,                                   /* tp_iternext */
+    errMethods                    /* tp_methods */
+};
+
 static struct PyModuleDef redirector =
 {
     PyModuleDef_HEAD_INIT,
     "redirector",
+    "",
+    -1,
+    ModuleMethods
+};
+
+static struct PyModuleDef err =
+{
+    PyModuleDef_HEAD_INIT,
+    "err",
     "",
     -1,
     ModuleMethods
@@ -206,6 +318,19 @@ PyMODINIT_FUNC PyInit_redirector(void)
     return redirectModule;
 }
 
+PyMODINIT_FUNC PyInit_err(void) {
+    PyObject* errModule;
+
+    err_errType.tp_new = PyType_GenericNew;
+    PyType_Ready(&err_errType);
+
+    errModule = PyModule_Create(&err);
+
+    Py_INCREF(&err_errType);
+    PyModule_AddObject(errModule, "err", (PyObject *)&err_errType);
+    return errModule;
+}
+
 PyMODINIT_FUNC PyInit_console(void) 
 {
     return PyModule_Create(&console);
@@ -230,6 +355,32 @@ void initredirector()
 
     /* add methods to class */
     for (def = redirectorMethods; def->ml_name != NULL; def++) {
+        PyObject *func = PyCFunction_New(def, NULL);
+        PyObject *method = PyInstanceMethod_New(func);
+        PyDict_SetItemString(classDict, def->ml_name, method);
+        Py_DECREF(func);
+        Py_DECREF(method);
+    }
+}
+
+void initerr() {
+    PyMethodDef *def;
+
+    /* create a new module and class */
+    PyObject *module = PyInit_err();
+    PyObject *moduleDict = PyModule_GetDict(module);
+    PyObject *classDict = PyDict_New();
+    PyObject *classBases = PyTuple_New(0);
+    PyObject *className = PyUnicode_FromString("err");
+    PyObject *fooType = PyType_GenericNew(&PyType_Type, classDict, className);
+    PyDict_SetItemString(moduleDict, "err", fooType);
+    Py_DECREF(classDict);
+    Py_DECREF(classBases);
+    Py_DECREF(className);
+    Py_DECREF(fooType);
+
+    /* add methods to class */
+    for (def = errMethods; def->ml_name != NULL; def++) {
         PyObject *func = PyCFunction_New(def, NULL);
         PyObject *method = PyInstanceMethod_New(func);
         PyDict_SetItemString(classDict, def->ml_name, method);
@@ -270,6 +421,7 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
 
     // inject wrapper modules
     PyImport_AppendInittab("redirector", &PyInit_redirector);
+    PyImport_AppendInittab("err", &PyInit_err);
     PyImport_AppendInittab("console", &PyInit_console);
 
     Py_Initialize();
@@ -286,13 +438,15 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
     //PyImport_ImportModule("rlcompleter");
     PyRun_SimpleString("import sys\n"
         "import redirector\n"
+        "import err\n"
         "import console\n"
         //"import rlcompleter\n"
         "sys.path.insert(0, \".\")\n" // add current
         // path
         "sys.stdout = redirector.redirector()\n"
-        "sys.stderr = sys.stdout\n"
+        "sys.stderr = err.err()\n"
         "import builtins\n"
+        "builtins.input=console.input\n"
         "builtins.clear=console.clear\n"
         "builtins.reset=console.reset\n"
         "builtins.save=console.save\n"
@@ -407,6 +561,7 @@ QString QPyConsole::interpretCommand(const QString &command, int *res)
             {
                 setMultilinePrompt(false);
                 this->command.append("\n");
+                insertPlainText("\n");
                 lines++;
                 resultString="";
                 QConsole::interpretCommand(command, res);
@@ -429,6 +584,7 @@ QString QPyConsole::interpretCommand(const QString &command, int *res)
             setNormalPrompt(false);
             this->command="";
             this->lines=0;
+            insertPlainText("\n");
 
             dum = PyEval_EvalCode (py_result, glb, loc);
             Py_XDECREF (dum);
@@ -447,6 +603,7 @@ QString QPyConsole::interpretCommand(const QString &command, int *res)
         else if (lines!=0 && command!="") //following multiliner line
         {
             this->command.append("\n");
+            insertPlainText("\n");
             *res=0;
             QConsole::interpretCommand(command, res);
             return "";

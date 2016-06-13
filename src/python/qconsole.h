@@ -147,6 +147,15 @@ public:
 
 		void correctPathName(QString& pathName);
 
+        //Get the command to validate
+        QString getCurrentCommand();
+
+        //Replace current command with a new one
+        void replaceCurrentCommand(const QString &newCommand);
+
+        //colors
+        QColor cmdColor_, errColor_, outColor_, completionColor;
+
 private:
 		void dropEvent( QDropEvent * event);
 		void dragMoveEvent( QDragMoveEvent * event);
@@ -156,11 +165,6 @@ private:
 
 		//Return false if the command is incomplete (e.g. unmatched braces)
 		virtual bool isCommandComplete(const QString &command);
-		//Get the command to validate
-		QString getCurrentCommand();
-
-        //Replace current command with a new one
-        void replaceCurrentCommand(const QString &newCommand);
 
 		//Test whether the cursor is in the edition zone
 		bool isInEditionZone();
@@ -174,8 +178,6 @@ private:
 
 //protected attributes
 protected:
-		//colors
-		QColor cmdColor_, errColor_, outColor_, completionColor;
 
 		int oldPosition;
 		// cached prompt length
