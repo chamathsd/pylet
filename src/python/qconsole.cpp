@@ -646,7 +646,7 @@ bool QConsole::execCommand(const QString &command, bool writeCommand,
 		}
 		if (!(strRes.isEmpty() || strRes.endsWith("\n")))
 			strRes.append("\n");
-		append(strRes);
+		//append(strRes);
 		moveCursor(QTextCursor::End);
 		//Display the prompt again
 		if (showPrompt)
