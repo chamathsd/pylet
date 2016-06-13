@@ -83,12 +83,14 @@ static PyObject* py_clear(PyObject *, PyObject *)
     QPyConsole::getInstance()->clear();
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     QPyConsole::getInstance()->setFont(monoFont);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_reset(PyObject *, PyObject *)
 {
     QPyConsole::getInstance()->reset();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -100,6 +102,7 @@ static PyObject* py_save(PyObject *, PyObject *args)
         return NULL;
     }
     QPyConsole::getInstance()->saveScript(filename);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -112,18 +115,21 @@ static PyObject* py_load(PyObject *, PyObject *args)
     }
     QPyConsole::getInstance()->loadScript(filename);
 
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_history(PyObject *, PyObject *)
 {
     QPyConsole::getInstance()->printHistory();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject* py_quit(PyObject *, PyObject *)
 {
     resultString="Use reset() to restart the interpreter; otherwise exit your application\n";
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
