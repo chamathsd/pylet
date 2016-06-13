@@ -61,6 +61,12 @@ if(WIN32)
 elseif(UNIX)
     if(APPLE)
         set(GUI_TYPE MACOSX_BUNDLE)
+        set(MACOSX_BUNDLE_BUNDLE_NAME Pylet)
+        set(MACOSX_BUNDLE_ICON_FILE pylet_temp_logo.icns)
+        set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/res/icons/pylet_temp_logo.icns)
+        set(SOURCE ${SOURCE} ${APP_ICON})
+        set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -117,7 +123,6 @@ if(MSVC)
 endif()
 
 # --- RUNTIME DEPENDENCIES ---
-# Only necessary on Windows.
 
 if(WIN32)
     cmake_policy(SET CMP0026 OLD)
@@ -142,4 +147,15 @@ if(WIN32)
             COMMENT "Copying ${DEPENDENCY} into '${TargetDirectory}/'" VERBATIM
         )
     endforeach()
+endif()
+
+if(APPLE)
+    add_custom_command(TARGET pylet POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin/pylet.app/Contents/MacOS
+        COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.5/Python @executable_path/../Frameworks/Python.framework/Versions/3.5/Python pylet
+    )
+    add_custom_command(TARGET pylet POST_BUILD
+        WORKING_DIRECTORY ${Qt5Core_DIR}/../../../bin
+        COMMAND ./macdeployqt ${CMAKE_BINARY_DIR}/bin/pylet.app
+    )
 endif()
