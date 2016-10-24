@@ -30,6 +30,7 @@
 #include <boost/python.hpp>
 #include "Python.h"
 #include "qconsole.h"
+#include "src/gui/info_box.h"
 
 /**An emulated singleton console for Python within a Qt application (based on the QConsole class)
  *@author Mondrian Nuessle
@@ -43,7 +44,8 @@ public:
 
     //get the QPyConsole instance
     static QPyConsole *getInstance(QWidget *parent = NULL,
-                                   const QString& welcomeText = "");
+                                   const QString& welcomeText = "",
+                                   InfoBox* infoBox = NULL);
 
     void printHistory();
 
@@ -57,13 +59,16 @@ public:
     QString interpretCommand(const QString &command, int *res);
     void runFile(const std::string &filename);
 
+    InfoBox* infoBoxPtr;
+
 protected:
     //give suggestions to complete a command (not working...)
     QStringList suggestCommand(const QString &cmd, QString& prefix);
 
     //private constructor
     QPyConsole(QWidget *parent = NULL,
-               const QString& welcomeText = "");
+               const QString& welcomeText = "",
+               InfoBox* infoBox = NULL);
 
     void setNormalPrompt(bool display) { setPrompt(">>> ", display); }
     void setMultilinePrompt(bool display) { setPrompt("... ", display); }

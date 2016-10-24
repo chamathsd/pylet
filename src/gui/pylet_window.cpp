@@ -86,7 +86,8 @@ void PyletWindow::initWidgets() {
     
     QPyConsole* pyConsole = QPyConsole::getInstance(coreWidget, "Python 3.4.4 (v3.4.4:737efcadf5a6, Dec 20 2015, 19:28:18)"
                                                                 "[MSC v.1600 32 bit (Intel)] on win32\n"
-                                                                "Type 'copyright', 'credits' or 'license()' for more information.");
+                                                                "Type 'copyright', 'credits' or 'license()' for more information.",
+                                                                infoBox);
     pyConsole->setMinimumWidth(280);
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     pyConsole->setFont(monoFont);

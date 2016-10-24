@@ -97,6 +97,32 @@ static PyObject* err_write(PyObject *, PyObject *args) {
         return NULL;
     }
     QString outputString = QString::fromLocal8Bit(output);
+    if (outputString.contains("SyntaxError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("SyntaxError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("A syntax error occurs when the interpreter is reading the Python file to determine if it is valid Python code and encounters something it doesn't \"understand\". The interpreter will check things like indentation, use of parentheses and square brackets, proper forms of if, elif, and else blocks, and so on.");
+    } else if (outputString.contains("IndentationError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("IndentationError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("Before Python runs any code in your program, it will first determine the correct parent and children of each line. Python produces an IndentationError whenever it comes across a line for which it cannot determine the right parent to assign.");
+    } else if (outputString.contains("NameError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("NameError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("This error occurs when a name (a variable or function name) is used that Python does not know about. It can occur if a programmer changes a variable's name but forgets to update the name everywhere in the Python file.");
+    } else if (outputString.contains("TypeError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("TypeError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("This error occurs when a function or operator cannot be applied to the given values, due to the fact that the value's type is inappropriate. This can happen when two incompatible types are used together, such as attempting to add a string and an integer.");
+    } else if (outputString.contains("IndexError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("IndexError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("This error occurs when an index into a list or string is out of range. For example, attempting my_list[2] when the list my_list has zero, one, or two elements will produce an IndexError. This will also occur in the same way with strings.");
+    } else if (outputString.contains("RuntimeError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("RuntimeError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("This error can be triggered by many problems, but it is most notably produced when a stack overflow occurs. If you have recursive functions, make sure that their base cases are functioning properly.");
+    } else if (outputString.contains("ImportError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("ImportError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("This error occurs when an import statement is used, but Python cannot find the Python module to import. A common use of import statements is to gain access to a function that comes with Python, but isn't available for use by default.");
+    } else if (outputString.contains("ZeroDivisionError")) {
+        QPyConsole::getInstance()->infoBoxPtr->errorLabel->setText("ZeroDivisionError");
+        QPyConsole::getInstance()->infoBoxPtr->errorDesc->setText("As it sounds, this error is produced when a division by zero occurs in your code. To avoid this error, you should make sure you have nonzero divisors before performing a division.");
+    }
+
     resultString.append(outputString);
     qApp->processEvents();
     QPyConsole::getInstance()->setTextColor(QPyConsole::getInstance()->errColor_);
@@ -401,11 +427,11 @@ void QPyConsole::printHistory()
 
 QPyConsole *QPyConsole::theInstance = NULL;
 
-QPyConsole *QPyConsole::getInstance(QWidget *parent, const QString& welcomeText)
+QPyConsole *QPyConsole::getInstance(QWidget *parent, const QString& welcomeText, InfoBox* infoBox)
 {
     if (!theInstance)
     {
-        theInstance = new QPyConsole(parent, welcomeText);
+        theInstance = new QPyConsole(parent, welcomeText, infoBox);
     }
     return theInstance;
 }
@@ -458,9 +484,10 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
 }
 
 //QTcl console constructor (init the QTextEdit & the attributes)
-QPyConsole::QPyConsole(QWidget *parent, const QString& welcomeText) :
+QPyConsole::QPyConsole(QWidget *parent, const QString& welcomeText, InfoBox* infoBox) :
         QConsole(parent, welcomeText),lines(0)
 {
+    infoBoxPtr = infoBox;
     launchPythonInstance(true);
     setWordWrapMode(QTextOption::WrapAnywhere);
 }
@@ -574,6 +601,7 @@ QString QPyConsole::interpretCommand(const QString &command, int *res)
                 QString result=resultString;
                 resultString="";
                 QConsole::interpretCommand(command, res);
+                insertPlainText("\n");
                 this->command="";
                 this->lines=0;
                 return result;
@@ -610,12 +638,16 @@ QString QPyConsole::interpretCommand(const QString &command, int *res)
         }
         else
         {
+            insertPlainText("\n");
             return "";
         }
 
     }
-    else
+    else 
+    {
+        insertPlainText("\n");
         return "";
+    }
 }
 
 QStringList QPyConsole::suggestCommand(const QString &cmd, QString& prefix)
