@@ -258,7 +258,7 @@ void PyletWindow::updateWindowTitle(int index) {
         setWindowTitle("Pylet");
     } else {
         if (CodeEditor* c = qobject_cast<CodeEditor*>(editorStack->widget(index))) {
-            if (c->filename != nullptr) {
+            if (c->location != "") {
                 setWindowTitle(c->location + " - Pylet");
             } else {
                 setWindowTitle(editorStack->tabText(index) + " - Pylet");
