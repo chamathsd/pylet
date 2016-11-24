@@ -67,11 +67,8 @@ void PyletWindow::initWidgets() {
     model = new QFileSystemModel(this);
     //model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
     fileTree = new QTreeView(navigator);
-    fileTree->setModel(blank);
+    fileTree->setModel(emptyModel);
     fileTree->setStyleSheet("background-color: #DDD;");
-    fileTree->hideColumn(1);
-    fileTree->hideColumn(2);
-    fileTree->hideColumn(3);
     connect(fileTree, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(openFromFileTree(const QModelIndex &)));
     navLayout->addWidget(fileTree, 3);
 
@@ -278,8 +275,11 @@ void PyletWindow::updateFileTree() {
             model->setRootPath(QString(QDir::Drives));
             fileTree->setRootIndex(model->index(QFileInfo(checkFile).absolutePath()));
             model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+            fileTree->hideColumn(1);
+            fileTree->hideColumn(2);
+            fileTree->hideColumn(3);
         } else {
-            fileTree->setModel(blank);
+            fileTree->setModel(emptyModel);
         }
     }
 }

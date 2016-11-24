@@ -9,6 +9,7 @@
 #include "code_editor_interface.h"
 #include "editor_stack.h"
 #include "console.h"
+#include <qstandarditemmodel.h>
 #include <qfilesystemmodel.h>
 #include <qmainwindow.h>
 #include <qtreeview.h>
@@ -31,7 +32,7 @@ private:
     Console* console;
     QLineEdit* shell;
     QFileSystemModel* model;
-    QFileSystemModel* blank = new QFileSystemModel(this);
+    QStandardItemModel* emptyModel = new QStandardItemModel(this);
     QTreeView* fileTree;
     QList<QAction*> actions;
     QToolBar *toolBar;
