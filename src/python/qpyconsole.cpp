@@ -42,6 +42,46 @@ PyObject* loc;
 
 QString resultString;
 
+static PyObject* completer_init(PyObject *, PyObject *)
+{
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject* completer_write(PyObject *, PyObject *args)
+{
+    char* output;
+    PyObject *selfi;
+
+    if (!PyArg_ParseTuple(args, "s", &output))
+    {
+        return NULL;
+    }
+    QString outputString = QString::fromLocal8Bit(output);
+    resultString.append(outputString);
+    qApp->processEvents();
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject* completer_flush(PyObject *, PyObject *args)
+{
+    resultString = "";
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef completerMethods[] =
+{
+    { "__init__", completer_init, METH_VARARGS,
+    "initialize the stdout/err completer" },
+    { "write", completer_write, METH_VARARGS,
+    "implement the write method for code completion" },
+    { "flush", completer_flush, METH_VARARGS,
+    "implement the flush method for code completion" },
+    { NULL,NULL,0,NULL },
+};
+
 static PyObject* redirector_init(PyObject *, PyObject *)
 {
     Py_INCREF(Py_None);
@@ -233,6 +273,11 @@ static PyMethodDef console_methods[] =  {
     {NULL, NULL,0,NULL}
 };
 
+typedef struct
+{
+    PyObject_HEAD
+} completer_completerObject;
+
 typedef struct {
     PyObject_HEAD
 } redirector_redirectorObject;
@@ -240,6 +285,37 @@ typedef struct {
 typedef struct {
     PyObject_HEAD
 } err_errObject;
+
+static PyTypeObject completer_completerType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "completer.completer",               /* tp_name */
+    sizeof(completer_completerObject),   /* tp_basicsize */
+    0,                                   /* tp_itemsize */
+    0,                                   /* tp_dealloc */
+    0,                                   /* tp_print */
+    0,                                   /* tp_getattr */
+    0,                                   /* tp_setattr */
+    0,                                   /* tp_reserved */
+    0,                                   /* tp_repr */
+    0,                                   /* tp_as_number */
+    0,                                   /* tp_as_sequence */
+    0,                                   /* tp_as_mapping */
+    0,                                   /* tp_hash  */
+    0,                                   /* tp_call */
+    0,                                   /* tp_str */
+    0,                                   /* tp_getattro */
+    0,                                   /* tp_setattro */
+    0,                                   /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                  /* tp_flags */
+    "",                                  /* tp_doc */
+    0,                                   /* tp_traverse */
+    0,                                   /* tp_clear */
+    0,                                   /* tp_richcompare */
+    0,                                   /* tp_weaklistoffset */
+    0,                                   /* tp_iter */
+    0,                                   /* tp_iternext */
+    completerMethods                    /* tp_methods */
+};
 
 static PyTypeObject redirector_redirectorType = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -274,8 +350,8 @@ static PyTypeObject redirector_redirectorType = {
 
 static PyTypeObject err_errType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "err.err",             /* tp_name */
-    sizeof(err_errObject), /* tp_basicsize */
+    "err.err",                           /* tp_name */
+    sizeof(err_errObject),               /* tp_basicsize */
     0,                                   /* tp_itemsize */
     0,                                   /* tp_dealloc */
     0,                                   /* tp_print */
@@ -301,6 +377,15 @@ static PyTypeObject err_errType = {
     0,                                   /* tp_iter */
     0,                                   /* tp_iternext */
     errMethods                    /* tp_methods */
+};
+
+static struct PyModuleDef completer =
+{
+    PyModuleDef_HEAD_INIT,
+    "completer",
+    "",
+    -1,
+    ModuleMethods
 };
 
 static struct PyModuleDef redirector =
@@ -329,6 +414,20 @@ static struct PyModuleDef console =
     -1,
     console_methods
 };
+
+PyMODINIT_FUNC PyInit_completer(void)
+{
+    PyObject* completerModule;
+
+    completer_completerType.tp_new = PyType_GenericNew;
+    PyType_Ready(&completer_completerType);
+
+    completerModule = PyModule_Create(&completer);
+
+    Py_INCREF(&completer_completerType);
+    PyModule_AddObject(completerModule, "completer", (PyObject *)&completer_completerType);
+    return completerModule;
+}
 
 PyMODINIT_FUNC PyInit_redirector(void) 
 {
@@ -360,6 +459,34 @@ PyMODINIT_FUNC PyInit_err(void) {
 PyMODINIT_FUNC PyInit_console(void) 
 {
     return PyModule_Create(&console);
+}
+
+void initcompleter()
+{
+    PyMethodDef *def;
+
+    /* create a new module and class */
+    PyObject *module = PyInit_completer();
+    PyObject *moduleDict = PyModule_GetDict(module);
+    PyObject *classDict = PyDict_New();
+    PyObject *classBases = PyTuple_New(0);
+    PyObject *className = PyUnicode_FromString("completer");
+    PyObject *fooType = PyType_GenericNew(&PyType_Type, classDict, className);
+    PyDict_SetItemString(moduleDict, "completer", fooType);
+    Py_DECREF(classDict);
+    Py_DECREF(classBases);
+    Py_DECREF(className);
+    Py_DECREF(fooType);
+
+    /* add methods to class */
+    for (def = completerMethods; def->ml_name != NULL; def++)
+    {
+        PyObject *func = PyCFunction_New(def, NULL);
+        PyObject *method = PyInstanceMethod_New(func);
+        PyDict_SetItemString(classDict, def->ml_name, method);
+        Py_DECREF(func);
+        Py_DECREF(method);
+    }
 }
 
 void initredirector()
@@ -446,6 +573,7 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
     Py_Finalize();
 
     // inject wrapper modules
+    PyImport_AppendInittab("completer", &PyInit_completer);
     PyImport_AppendInittab("redirector", &PyInit_redirector);
     PyImport_AppendInittab("err", &PyInit_err);
     PyImport_AppendInittab("console", &PyInit_console);
@@ -461,12 +589,13 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
     loc = glb = PyModule_GetDict(module);
 
     // NOTE: rlcompleter breaks initialization on Unix
-    //PyImport_ImportModule("rlcompleter");
+    PyImport_ImportModule("rlcompleter");
     PyRun_SimpleString("import sys\n"
+        "import completer\n"
         "import redirector\n"
         "import err\n"
         "import console\n"
-        //"import rlcompleter\n"
+        "import rlcompleter\n"
         "sys.path.insert(0, \".\")\n" // add current
         // path
         "sys.stdout = redirector.redirector()\n"
@@ -479,7 +608,7 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
         "builtins.load=console.load\n"
         "builtins.history=console.history\n"
         "builtins.quit=console.quit\n"
-        //"builtins.completer=rlcompleter.Completer()\n"
+        "builtins.complete=rlcompleter.Completer()\n"
         );
 }
 
@@ -657,9 +786,10 @@ QStringList QPyConsole::suggestCommand(const QString &cmd, QString& prefix)
     QStringList list;
     prefix = "";
     resultString="";
+    PyRun_SimpleString("sys.stdout=completer.completer()");
     if (!cmd.isEmpty()) {
         do {
-            snprintf(run,255,"print completer.complete(\"%s\",%d)\n",
+            snprintf(run,255,"print(complete.complete(\"%s\",%d))\n",
                      cmd.toLatin1().data(),n);
             PyRun_SimpleString(run);
             resultString=resultString.trimmed(); //strip trailing newline
@@ -676,6 +806,7 @@ QStringList QPyConsole::suggestCommand(const QString &cmd, QString& prefix)
             n++;
         } while (true);
     }
+    PyRun_SimpleString("sys.stdout=redirector.redirector()");
     list.removeDuplicates();
     return list;
 }

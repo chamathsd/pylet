@@ -27,7 +27,7 @@
 #include <QScrollBar>
 #include <QDesktopWidget>
 
-//#define USE_POPUP_COMPLETER
+#define USE_POPUP_COMPLETER
 #define WRITE_ONLY QIODevice::WriteOnly
 
 QSize PopupListWidget::sizeHint() const
@@ -295,6 +295,7 @@ QStringList QConsole::suggestCommand(const QString&, QString& prefix)
 //Treat the tab key & autocomplete the current command
 void QConsole::handleTabKeyPress()
 {
+#ifdef Q_OS_WIN
 		QString command = getCurrentCommand();
 		QString commandPrefix;
 		QStringList sl = suggestCommand(command, commandPrefix);
@@ -323,6 +324,10 @@ void QConsole::handleTabKeyPress()
 #endif
 			}
 		}
+#else
+    // TODO: confirm if completer is working properly on Unix platforms
+    textCursor().insertText("\t");
+#endif
 }
 
 // If return pressed, do the evaluation and append the result
