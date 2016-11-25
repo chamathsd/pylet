@@ -100,6 +100,7 @@ static PyObject* redirector_write(PyObject *, PyObject *args)
     QString outputString = QString::fromLocal8Bit(output);
     resultString.append(outputString);
     qApp->processEvents();
+    QPyConsole::getInstance()->moveCursor(QTextCursor::End);
     QPyConsole::getInstance()->setTextColor(QPyConsole::getInstance()->outColor_);
     QPyConsole::getInstance()->insertPlainText(outputString);
     QPyConsole::getInstance()->ensureCursorVisible();
@@ -165,6 +166,7 @@ static PyObject* err_write(PyObject *, PyObject *args) {
 
     resultString.append(outputString);
     qApp->processEvents();
+    QPyConsole::getInstance()->moveCursor(QTextCursor::End);
     QPyConsole::getInstance()->setTextColor(QPyConsole::getInstance()->errColor_);
     QPyConsole::getInstance()->insertPlainText(outputString);
     QPyConsole::getInstance()->ensureCursorVisible();
