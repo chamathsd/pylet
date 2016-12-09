@@ -35,8 +35,6 @@ set(GUI_SOURCE
 )
 
 set(PYTHON_SOURCE
-    src/python/buffer.cpp
-    src/python/buffer.h
     src/python/qconsole.cpp
     src/python/qconsole.h
     src/python/qpyconsole.cpp
