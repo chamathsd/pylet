@@ -10,7 +10,8 @@
 #include <iostream>
 #include <sstream>
 
-namespace emb {
+namespace emb
+{
 
     typedef std::function<void(std::string)> stdout_write_type;
 
@@ -140,7 +141,7 @@ std::string parsePyFile(const std::string &filename) {
 
     // Clean up all resources from previous Python runtime
     Py_Finalize();
-    
+
     PyImport_AppendInittab("emb", emb::PyInit_emb);
     Py_Initialize();
     PyObject* embModule = PyImport_ImportModule("emb");

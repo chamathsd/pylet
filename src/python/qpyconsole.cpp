@@ -37,24 +37,25 @@
 #include <QDebug>
 #include <fstream>
 
+#ifdef Q_OS_WIN
+#define snprintf _snprintf_s
+#define strcpy strcpy_s
+#endif
+
 PyObject* glb;
 PyObject* loc;
 
 QString resultString;
 
-static PyObject* completer_init(PyObject *, PyObject *)
-{
+static PyObject* completer_init(PyObject *, PyObject *) {
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* completer_write(PyObject *, PyObject *args)
-{
+static PyObject* completer_write(PyObject *, PyObject *args) {
     char* output;
-    PyObject *selfi;
 
-    if (!PyArg_ParseTuple(args, "s", &output))
-    {
+    if (!PyArg_ParseTuple(args, "s", &output)) {
         return NULL;
     }
     QString outputString = QString::fromLocal8Bit(output);
@@ -64,8 +65,7 @@ static PyObject* completer_write(PyObject *, PyObject *args)
     return Py_None;
 }
 
-static PyObject* completer_flush(PyObject *, PyObject *args)
-{
+static PyObject* completer_flush(PyObject *, PyObject *args) {
     resultString = "";
     Py_INCREF(Py_None);
     return Py_None;
@@ -82,19 +82,15 @@ static PyMethodDef completerMethods[] =
     { NULL,NULL,0,NULL },
 };
 
-static PyObject* redirector_init(PyObject *, PyObject *)
-{
+static PyObject* redirector_init(PyObject *, PyObject *) {
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* redirector_write(PyObject *, PyObject *args)
-{
+static PyObject* redirector_write(PyObject *, PyObject *args) {
     char* output;
-    PyObject *selfi;
 
-    if (!PyArg_ParseTuple(args,"s",&output))
-    {
+    if (!PyArg_ParseTuple(args, "s", &output)) {
         return NULL;
     }
     QString outputString = QString::fromLocal8Bit(output);
@@ -132,7 +128,6 @@ static PyObject* err_init(PyObject *, PyObject *) {
 
 static PyObject* err_write(PyObject *, PyObject *args) {
     char* output;
-    PyObject *selfi;
 
     if (!PyArg_ParseTuple(args, "s", &output)) {
         return NULL;
@@ -191,12 +186,10 @@ static PyMethodDef errMethods[] =
     { NULL, NULL, 0, NULL },
 };
 
-static PyObject* py_input(PyObject *, PyObject *args) 
-{
+static PyObject* py_input(PyObject *, PyObject *args) {
     char* output;
 
-    if (!PyArg_ParseTuple(args, "s", &output)) 
-    {
+    if (!PyArg_ParseTuple(args, "s", &output)) {
         return NULL;
     }
     QString outputString = QString::fromLocal8Bit(output);
@@ -207,8 +200,7 @@ static PyObject* py_input(PyObject *, PyObject *args)
     return out;
 }
 
-static PyObject* py_clear(PyObject *, PyObject *)
-{
+static PyObject* py_clear(PyObject *, PyObject *) {
     QPyConsole::getInstance()->clear();
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     QPyConsole::getInstance()->setFont(monoFont);
@@ -216,18 +208,15 @@ static PyObject* py_clear(PyObject *, PyObject *)
     return Py_None;
 }
 
-static PyObject* py_reset(PyObject *, PyObject *)
-{
+static PyObject* py_reset(PyObject *, PyObject *) {
     QPyConsole::getInstance()->reset();
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* py_save(PyObject *, PyObject *args)
-{
+static PyObject* py_save(PyObject *, PyObject *args) {
     char* filename;
-    if (!PyArg_ParseTuple(args,"s",&filename))
-    {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
     QPyConsole::getInstance()->saveScript(filename);
@@ -235,11 +224,9 @@ static PyObject* py_save(PyObject *, PyObject *args)
     return Py_None;
 }
 
-static PyObject* py_load(PyObject *, PyObject *args)
-{
+static PyObject* py_load(PyObject *, PyObject *args) {
     char* filename;
-    if (!PyArg_ParseTuple(args,"s",&filename))
-    {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
     QPyConsole::getInstance()->loadScript(filename);
@@ -248,22 +235,20 @@ static PyObject* py_load(PyObject *, PyObject *args)
     return Py_None;
 }
 
-static PyObject* py_history(PyObject *, PyObject *)
-{
+static PyObject* py_history(PyObject *, PyObject *) {
     QPyConsole::getInstance()->printHistory();
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject* py_quit(PyObject *, PyObject *)
-{
-    resultString="Use reset() to restart the interpreter; otherwise exit your application\n";
+static PyObject* py_quit(PyObject *, PyObject *) {
+    resultString = "Use reset() to restart the interpreter; otherwise exit your application\n";
     Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyMethodDef ModuleMethods[] = { {NULL,NULL,0,NULL} };
-static PyMethodDef console_methods[] =  {
+static PyMethodDef console_methods[] = {
     {"input", py_input, METH_VARARGS, "gets input from the user" },
     {"clear",py_clear, METH_VARARGS,"clears the console"},
     {"reset",py_reset, METH_VARARGS,"reset the interpreter and clear the console"},
@@ -275,8 +260,7 @@ static PyMethodDef console_methods[] =  {
     {NULL, NULL,0,NULL}
 };
 
-typedef struct
-{
+typedef struct {
     PyObject_HEAD
 } completer_completerObject;
 
@@ -417,8 +401,7 @@ static struct PyModuleDef console =
     console_methods
 };
 
-PyMODINIT_FUNC PyInit_completer(void)
-{
+PyMODINIT_FUNC PyInit_completer(void) {
     PyObject* completerModule;
 
     completer_completerType.tp_new = PyType_GenericNew;
@@ -431,8 +414,7 @@ PyMODINIT_FUNC PyInit_completer(void)
     return completerModule;
 }
 
-PyMODINIT_FUNC PyInit_redirector(void) 
-{
+PyMODINIT_FUNC PyInit_redirector(void) {
     PyObject* redirectModule;
 
     redirector_redirectorType.tp_new = PyType_GenericNew;
@@ -441,7 +423,7 @@ PyMODINIT_FUNC PyInit_redirector(void)
     redirectModule = PyModule_Create(&redirector);
 
     Py_INCREF(&redirector_redirectorType);
-    PyModule_AddObject(redirectModule, "redirector", (PyObject *) &redirector_redirectorType);
+    PyModule_AddObject(redirectModule, "redirector", (PyObject *)&redirector_redirectorType);
     return redirectModule;
 }
 
@@ -458,13 +440,11 @@ PyMODINIT_FUNC PyInit_err(void) {
     return errModule;
 }
 
-PyMODINIT_FUNC PyInit_console(void) 
-{
+PyMODINIT_FUNC PyInit_console(void) {
     return PyModule_Create(&console);
 }
 
-void initcompleter()
-{
+void initcompleter() {
     PyMethodDef *def;
 
     /* create a new module and class */
@@ -481,8 +461,7 @@ void initcompleter()
     Py_DECREF(fooType);
 
     /* add methods to class */
-    for (def = completerMethods; def->ml_name != NULL; def++)
-    {
+    for (def = completerMethods; def->ml_name != NULL; def++) {
         PyObject *func = PyCFunction_New(def, NULL);
         PyObject *method = PyInstanceMethod_New(func);
         PyDict_SetItemString(classDict, def->ml_name, method);
@@ -491,8 +470,7 @@ void initcompleter()
     }
 }
 
-void initredirector()
-{
+void initredirector() {
     PyMethodDef *def;
 
     /* create a new module and class */
@@ -544,30 +522,25 @@ void initerr() {
     }
 }
 
-void QPyConsole::printHistory()
-{
+void QPyConsole::printHistory() {
     uint index = 1;
-    for ( QStringList::Iterator it = history.begin(); it != history.end(); ++it )
-    {
+    for (QStringList::Iterator it = history.begin(); it != history.end(); ++it) {
         resultString.append(QString("%1\t%2\n").arg(index).arg(*it));
-        index ++;
+        index++;
     }
 }
 
 QPyConsole *QPyConsole::theInstance = NULL;
 
-QPyConsole *QPyConsole::getInstance(QWidget *parent, const QString& welcomeText, InfoBox* infoBox)
-{
-    if (!theInstance)
-    {
+QPyConsole *QPyConsole::getInstance(QWidget *parent, const QString& welcomeText, InfoBox* infoBox) {
+    if (!theInstance) {
         theInstance = new QPyConsole(parent, welcomeText, infoBox);
     }
     return theInstance;
 }
 
 void QPyConsole::launchPythonInstance(bool firstRun) {
-    if (firstRun) 
-    {
+    if (firstRun) {
         //set the Python Prompt
         setNormalPrompt(true);
     }
@@ -616,8 +589,7 @@ void QPyConsole::launchPythonInstance(bool firstRun) {
 
 //QTcl console constructor (init the QTextEdit & the attributes)
 QPyConsole::QPyConsole(QWidget *parent, const QString& welcomeText, InfoBox* infoBox) :
-        QConsole(parent, welcomeText),lines(0)
-{
+    QConsole(parent, welcomeText), lines(0) {
     infoBoxPtr = infoBox;
     launchPythonInstance(true);
     setWordWrapMode(QTextOption::WrapAnywhere);
@@ -630,8 +602,7 @@ QString QPyConsole::generateRestartString() {
     return restartString;
 }
 
-void QPyConsole::runFile(const std::string &filename) 
-{
+void QPyConsole::runFile(const std::string &filename) {
     launchPythonInstance(false);
     append(generateRestartString());
 
@@ -646,8 +617,7 @@ void QPyConsole::runFile(const std::string &filename)
 char save_error_type[1024], save_error_info[1024];
 
 bool
-QPyConsole::py_check_for_unexpected_eof()
-{
+QPyConsole::py_check_for_unexpected_eof() {
     PyObject *errobj, *errdata, *errtraceback, *pystring;
 
     /* get latest python exception info */
@@ -657,11 +627,9 @@ QPyConsole::py_check_for_unexpected_eof()
     if (errobj != NULL &&
         (pystring = PyObject_Str(errobj)) != NULL &&     /* str(object) */
         (PyUnicode_Check(pystring))
-        )
-    {
+        ) {
         strcpy(save_error_type, PyUnicode_AsUTF8(pystring));
-    }
-    else
+    } else
         strcpy(save_error_type, "<unknown exception type>");
     Py_XDECREF(pystring);
 
@@ -675,13 +643,12 @@ QPyConsole::py_check_for_unexpected_eof()
         strcpy(save_error_info, "<unknown exception data>");
     Py_XDECREF(pystring);
 
-    if (strstr(save_error_type, "exceptions.SyntaxError")!=NULL &&
-        strncmp(save_error_info,"('unexpected EOF while parsing',",32)==0)
-    {
+    if (strstr(save_error_type, "exceptions.SyntaxError") != NULL &&
+        strncmp(save_error_info, "('unexpected EOF while parsing',", 32) == 0) {
         return true;
     }
-    PyErr_Print ();
-    resultString="Error: ";
+    PyErr_Print();
+    resultString = "Error: ";
     resultString.append(save_error_info);
     Py_XDECREF(errobj);
     Py_XDECREF(errdata);         /* caller owns all 3 */
@@ -690,119 +657,101 @@ QPyConsole::py_check_for_unexpected_eof()
 }
 
 //Desctructor
-QPyConsole::~QPyConsole()
-{
+QPyConsole::~QPyConsole() {
     Py_Finalize();
 }
 
 //Call the Python interpreter to execute the command
 //retrieve back results using the python internal stdout/err redirectory (see above)
-QString QPyConsole::interpretCommand(const QString &command, int *res)
-{
+QString QPyConsole::interpretCommand(const QString &command, int *res) {
     PyObject* py_result;
     PyObject* dum;
-    bool multiline=false;
+    bool multiline = false;
     *res = 0;
-    if (!command.startsWith('#') && (!command.isEmpty() || (command.isEmpty() && lines!=0)))
-    {
+    if (!command.startsWith('#') && (!command.isEmpty() || (command.isEmpty() && lines != 0))) {
         this->command.append(command);
-        py_result=Py_CompileString(this->command.toLocal8Bit().data(),"<stdin>",Py_single_input);
-        if (py_result==0)
-        {
-            multiline=py_check_for_unexpected_eof();
+        py_result = Py_CompileString(this->command.toLocal8Bit().data(), "<stdin>", Py_single_input);
+        if (py_result == 0) {
+            multiline = py_check_for_unexpected_eof();
             if (!multiline) {
                 if (command.endsWith(':'))
                     multiline = true;
             }
 
-            if (multiline)
-            {
+            if (multiline) {
                 setMultilinePrompt(false);
                 this->command.append("\n");
                 insertPlainText("\n");
                 lines++;
-                resultString="";
+                resultString = "";
                 QConsole::interpretCommand(command, res);
                 return "";
-            }
-            else
-            {
+            } else {
                 setNormalPrompt(false);
-                *res=-1;
-                QString result=resultString;
-                resultString="";
+                *res = -1;
+                QString result = resultString;
+                resultString = "";
                 QConsole::interpretCommand(command, res);
                 insertPlainText("\n");
-                this->command="";
-                this->lines=0;
+                this->command = "";
+                this->lines = 0;
                 return result;
             }
         }
-        if ( (lines!=0 && command=="") || (this->command!="" && lines==0))
-        {
+        if ((lines != 0 && command == "") || (this->command != "" && lines == 0)) {
             setNormalPrompt(false);
-            this->command="";
-            this->lines=0;
+            this->command = "";
+            this->lines = 0;
             insertPlainText("\n");
 
-            dum = PyEval_EvalCode (py_result, glb, loc);
-            Py_XDECREF (dum);
-            Py_XDECREF (py_result);
-            if (PyErr_Occurred ())
-            {
-                *res=-1;
-                PyErr_Print ();
+            dum = PyEval_EvalCode(py_result, glb, loc);
+            Py_XDECREF(dum);
+            Py_XDECREF(py_result);
+            if (PyErr_Occurred()) {
+                *res = -1;
+                PyErr_Print();
             }
-            QString result=resultString;
-            resultString="";
-            if (command!="")
+            QString result = resultString;
+            resultString = "";
+            if (command != "")
                 QConsole::interpretCommand(command, res);
             return result;
-        }
-        else if (lines!=0 && command!="") //following multiliner line
+        } else if (lines != 0 && command != "") //following multiliner line
         {
             this->command.append("\n");
             insertPlainText("\n");
-            *res=0;
+            *res = 0;
             QConsole::interpretCommand(command, res);
             return "";
-        }
-        else
-        {
+        } else {
             insertPlainText("\n");
             return "";
         }
 
-    }
-    else 
-    {
+    } else {
         insertPlainText("\n");
         return "";
     }
 }
 
-QStringList QPyConsole::suggestCommand(const QString &cmd, QString& prefix)
-{
+QStringList QPyConsole::suggestCommand(const QString &cmd, QString& prefix) {
     char run[255];
-    int n =0;
+    int n = 0;
     QStringList list;
     prefix = "";
-    resultString="";
+    resultString = "";
     PyRun_SimpleString("sys.stdout=completer.completer()");
     if (!cmd.isEmpty()) {
         do {
-            snprintf(run,255,"print(complete.complete(\"%s\",%d))\n",
-                     cmd.toLatin1().data(),n);
+            snprintf(run, 255, "print(complete.complete(\"%s\",%d))\n",
+                cmd.toLatin1().data(), n);
             PyRun_SimpleString(run);
-            resultString=resultString.trimmed(); //strip trailing newline
-            if (resultString!="None")
-            {
+            resultString = resultString.trimmed(); //strip trailing newline
+            if (resultString != "None") {
                 list.append(resultString);
-                resultString="";
-            }
-            else
-            {
-                resultString="";
+                resultString = "";
+            } else {
+                resultString = "";
                 break;
             }
             n++;

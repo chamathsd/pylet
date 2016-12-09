@@ -25,7 +25,7 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent) : QSyntaxHighlighter
     styles["numbers"] = createFormat(QBrush("#000000"));
 
     QList<QString> keywords;
-    keywords 
+    keywords
         << "and" << "assert" << "break" << "class" << "continue" << "def"
         << "del" << "elif" << "else" << "except" << "exec" << "finally" << "for"
         << "from" << "global" << "if" << "import" << "in" << "is" << "lambda"

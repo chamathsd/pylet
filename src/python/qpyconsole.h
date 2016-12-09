@@ -36,16 +36,15 @@
  *@author Mondrian Nuessle
  */
 
-class QPyConsole : public QConsole
-{
+class QPyConsole : public QConsole {
 public:
     //destructor
     ~QPyConsole();
 
     //get the QPyConsole instance
     static QPyConsole *getInstance(QWidget *parent = NULL,
-                                   const QString& welcomeText = "",
-                                   InfoBox* infoBox = NULL);
+        const QString& welcomeText = "",
+        InfoBox* infoBox = NULL);
 
     void printHistory();
 
@@ -67,11 +66,13 @@ protected:
 
     //private constructor
     QPyConsole(QWidget *parent = NULL,
-               const QString& welcomeText = "",
-               InfoBox* infoBox = NULL);
+        const QString& welcomeText = "",
+        InfoBox* infoBox = NULL);
 
     void setNormalPrompt(bool display) { setPrompt(">>> ", display); }
     void setMultilinePrompt(bool display) { setPrompt("... ", display); }
+
+
 
 private:
 

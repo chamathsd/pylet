@@ -80,18 +80,18 @@ void PyletWindow::initWidgets() {
     coreWidget->insertWidget(1, editorStack);
 
     editorStack->insertEditor();
-    
+
     QPyConsole* pyConsole = QPyConsole::getInstance(coreWidget, "Python 3.4.4 (v3.4.4:737efcadf5a6, Dec 20 2015, 19:28:18)"
-                                                                "[MSC v.1600 32 bit (Intel)] on win32\n"
-                                                                "Type 'copyright', 'credits' or 'license()' for more information.",
-                                                                infoBox);
+        "[MSC v.1600 32 bit (Intel)] on win32\n"
+        "Type 'copyright', 'credits' or 'license()' for more information.",
+        infoBox);
     pyConsole->setMinimumWidth(280);
     QFont monoFont = QFont("Courier New", 12, QFont::Normal, false);
     pyConsole->setFont(monoFont);
     pyConsole->setFocus();
 
     //connect(shell, SIGNAL(returnPressed()), this, SLOT(parseConsoleString()));
-    
+
     coreWidget->insertWidget(2, pyConsole);
     editorStack->pyConsole = pyConsole;
 
@@ -173,55 +173,55 @@ void PyletWindow::initWidgets() {
 
     /* QMenu population */
     QMenu *fileMenu = menuBar()->addMenu("File");
-        fileMenu->addAction(newFile);
-        fileMenu->addSeparator();
-        fileMenu->addAction(open);
-        fileMenu->addSeparator();
-        fileMenu->addAction(save);
-        fileMenu->addAction(saveAs);
-        fileMenu->addAction(saveAll);
-        fileMenu->addSeparator();
-        fileMenu->addAction(close);
-        fileMenu->addAction(closeAll);
+    fileMenu->addAction(newFile);
+    fileMenu->addSeparator();
+    fileMenu->addAction(open);
+    fileMenu->addSeparator();
+    fileMenu->addAction(save);
+    fileMenu->addAction(saveAs);
+    fileMenu->addAction(saveAll);
+    fileMenu->addSeparator();
+    fileMenu->addAction(close);
+    fileMenu->addAction(closeAll);
     QMenu *editMenu = menuBar()->addMenu("Edit");
-        editMenu->addAction(undo);
-        editMenu->addAction(redo);
-        editMenu->addSeparator();
-        editMenu->addAction(cut);
-        editMenu->addAction(copy);
-        editMenu->addAction(paste);
-        editMenu->addAction(selectAll);
+    editMenu->addAction(undo);
+    editMenu->addAction(redo);
+    editMenu->addSeparator();
+    editMenu->addAction(cut);
+    editMenu->addAction(copy);
+    editMenu->addAction(paste);
+    editMenu->addAction(selectAll);
     QMenu *searchMenu = menuBar()->addMenu("Search");
     QMenu *runMenu = menuBar()->addMenu("Run");
-        runMenu->addAction(run);
+    runMenu->addAction(run);
     QMenu *viewMenu = menuBar()->addMenu("View");
-        QMenu *zoomMenu = viewMenu->addMenu("Zoom");
-            zoomMenu->addAction(zoomIn);
-            zoomMenu->addAction(zoomOut);
-            zoomMenu->addAction(resetZoom);
+    QMenu *zoomMenu = viewMenu->addMenu("Zoom");
+    zoomMenu->addAction(zoomIn);
+    zoomMenu->addAction(zoomOut);
+    zoomMenu->addAction(resetZoom);
     QMenu *settingsMenu = menuBar()->addMenu("Settings");
     QMenu *helpMenu = menuBar()->addMenu("Help");
 
     /* QToolBar population */
     toolBar = addToolBar("Action Bar");
-    
+
     QPixmap newIcon(":/pylet_icons/icons/new-file.png"),
-            openIcon(":/pylet_icons/icons/open-file.png"),
-            saveIcon(":/pylet_icons/icons/save.png"),
-            saveAllIcon(":/pylet_icons/icons/save-all.png"),
-            closeIcon(":/pylet_icons/icons/close-file.png"),
-            closeAllIcon(":/pylet_icons/icons/close-all.png"),
-            runIcon(":/pylet_icons/icons/run.png"),
-            interruptIcon(":/pylet_icons/icons/interrupt.png"),
-            cutIcon(":/pylet_icons/icons/cut.png"),
-            copyIcon(":/pylet_icons/icons/copy.png"),
-            pasteIcon(":/pylet_icons/icons/paste.png"),
-            undoIcon(":/pylet_icons/icons/undo.png"),
-            redoIcon(":/pylet_icons/icons/redo.png"),
-            zoomInIcon(":/pylet_icons/icons/zoom-in.png"),
-            zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
-            zoomResetIcon(":/pylet_icons/icons/zoom-fit.png"),
-            settingsIcon(":/pylet_icons/icons/settings.png");
+        openIcon(":/pylet_icons/icons/open-file.png"),
+        saveIcon(":/pylet_icons/icons/save.png"),
+        saveAllIcon(":/pylet_icons/icons/save-all.png"),
+        closeIcon(":/pylet_icons/icons/close-file.png"),
+        closeAllIcon(":/pylet_icons/icons/close-all.png"),
+        runIcon(":/pylet_icons/icons/run.png"),
+        interruptIcon(":/pylet_icons/icons/interrupt.png"),
+        cutIcon(":/pylet_icons/icons/cut.png"),
+        copyIcon(":/pylet_icons/icons/copy.png"),
+        pasteIcon(":/pylet_icons/icons/paste.png"),
+        undoIcon(":/pylet_icons/icons/undo.png"),
+        redoIcon(":/pylet_icons/icons/redo.png"),
+        zoomInIcon(":/pylet_icons/icons/zoom-in.png"),
+        zoomOutIcon(":/pylet_icons/icons/zoom-out.png"),
+        zoomResetIcon(":/pylet_icons/icons/zoom-fit.png"),
+        settingsIcon(":/pylet_icons/icons/settings.png");
     toolBar->addAction(QIcon(newIcon), "New File", editorStack, SLOT(insertEditor()));
     toolBar->addAction(QIcon(openIcon), "Open File", editorStack, SLOT(open()));
     toolBar->addAction(QIcon(saveIcon), "Save File", editorStack, SLOT(save()));

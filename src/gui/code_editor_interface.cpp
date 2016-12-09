@@ -13,8 +13,8 @@
 #include <qpainter.h>
 #include <qdebug.h>
 
-CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath) : 
-    location(filePath), 
+CodeEditor::CodeEditor(QSettings* s, QWidget* parent, const QString &filePath) :
+    location(filePath),
     QPlainTextEdit(parent) {
 
     lineNumbers = new LineNumberWidget(this);
@@ -123,7 +123,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
             break;
         }
 
-        /* Check line for colons and return keyword to handle indentation on next line*/
+                          /* Check line for colons and return keyword to handle indentation on next line*/
         case Qt::Key_Return: case Qt::Key_Enter: {
             QString currentBlock = this->textCursor().block().text();
             QString::const_iterator iter = currentBlock.begin();
@@ -142,7 +142,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
             QString colonSearch;
             QString returnSearch;
 
-            /* TODO: Handle edge cases where cursor is before colon or return keyword 
+            /* TODO: Handle edge cases where cursor is before colon or return keyword
              *       Handle paranthetical parameter indentation.
              */
 
@@ -185,11 +185,11 @@ void CodeEditor::keyPressEvent(QKeyEvent *event) {
 
             QPlainTextEdit::keyPressEvent(event);
             this->textCursor().insertText(whitespace);
-            
+
             break;
         }
 
-        /* Compare whitespace before cursor to tabSpacing for auto tab-decrement on backspace */
+                             /* Compare whitespace before cursor to tabSpacing for auto tab-decrement on backspace */
         case Qt::Key_Backspace: {
             QString currentBlock = this->textCursor().block().text();
             int cursorPos = this->textCursor().positionInBlock();

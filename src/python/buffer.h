@@ -11,7 +11,8 @@
 #include <boost/python.hpp>
 #include "Python.h"
 
-namespace emb {
+namespace emb
+{
 
     typedef std::function<void(std::string)> stdout_write_type;
 

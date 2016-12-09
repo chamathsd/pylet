@@ -14,7 +14,7 @@
 #include <qdebug.h>
 
 EditorStack::EditorStack(QSettings* s, QWidget *parent) :
-    settingsPtr(s), 
+    settingsPtr(s),
     QTabWidget(parent) {
 
     setStyleSheet("QTabBar::tab { height: 30px; }");
@@ -173,7 +173,7 @@ void EditorStack::open(QFile* openFile) {
     } else {
         codeEditor = insertEditor(QFileInfo(*openFile).absoluteFilePath());
     }
-    
+
     if (openFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream stream(openFile);
         codeEditor->setPlainText(stream.readAll());
