@@ -23,15 +23,18 @@ set(CORE_SOURCE
 set(GUI_SOURCE
     src/gui/pylet_window.cpp
     src/gui/pylet_window.h
-    src/gui/code_editor_interface.cpp
-    src/gui/code_editor_interface.h
-    src/gui/code_editor_numbers.h 
-    src/gui/code_editor_highlighter.cpp
-    src/gui/code_editor_highlighter.h
-    src/gui/editor_stack.cpp
-    src/gui/editor_stack.h
     src/gui/info_box.cpp
     src/gui/info_box.h
+)
+
+set(GUI_EDITOR_SOURCE
+    src/gui/editor/code_editor_interface.cpp
+    src/gui/editor/code_editor_interface.h
+    src/gui/editor/code_editor_numbers.h 
+    src/gui/editor/code_editor_highlighter.cpp
+    src/gui/editor/code_editor_highlighter.h
+    src/gui/editor/editor_stack.cpp
+    src/gui/editor/editor_stack.h
 )
 
 set(PYTHON_SOURCE
@@ -44,6 +47,7 @@ set(PYTHON_SOURCE
 set(SOURCE
     ${CORE_SOURCE}
     ${GUI_SOURCE}
+    ${GUI_EDITOR_SOURCE}
     ${PYTHON_SOURCE}
 )
 
@@ -113,6 +117,7 @@ target_link_libraries(pylet
 if(MSVC)
     source_group("src\\" FILES ${CORE_SOURCE})
     source_group("src\\gui" FILES ${GUI_SOURCE})
+    source_group("src\\gui\\editor" FILES ${GUI_EDITOR_SOURCE})
     source_group("src\\python" FILES ${PYTHON_SOURCE})
 
     set(WIN_LINKFLAGS \"${CMAKE_CURRENT_SOURCE_DIR}/res/app_icon.res\")

@@ -6,9 +6,8 @@
 #ifndef PYLET_WINDOW_H
 #define PYLET_WINDOW_H
 
-#include "code_editor_interface.h"
-#include "editor_stack.h"
-#include "console.h"
+#include "editor\code_editor_interface.h"
+#include "editor\editor_stack.h"
 #include <qstandarditemmodel.h>
 #include <qfilesystemmodel.h>
 #include <qmainwindow.h>
@@ -29,7 +28,7 @@ private:
     void initWidgets();
     CodeEditor* codeEditor;
     EditorStack* editorStack;
-    Console* console;
+    //Console* console;
     QLineEdit* shell;
     QFileSystemModel* model;
     QStandardItemModel* emptyModel = new QStandardItemModel(this);
