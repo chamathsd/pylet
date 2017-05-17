@@ -6,7 +6,6 @@
 #include "pylet_window.h"
 #include "src/python/qpyconsole.h"
 #include "info_box.h"
-#include <boost/python.hpp>
 #include <qstandardpaths.h>
 #include <qapplication.h>
 #include <qdesktopwidget.h>

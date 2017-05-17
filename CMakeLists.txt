@@ -78,15 +78,15 @@ else()
     MESSAGE(FATAL_ERROR "Target OS not recognized or supported, aborting CMake process.")
 endif()
 
-set(Boost_USE_STATIC_LIBS       OFF)
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
+#set(Boost_USE_STATIC_LIBS       OFF)
+#set(Boost_USE_MULTITHREADED      ON)
+#set(Boost_USE_STATIC_RUNTIME    OFF)
 
 find_package(PythonLibs 3 REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
-find_package(Boost COMPONENTS python3 REQUIRED)
+#find_package(Boost COMPONENTS python3 REQUIRED)
 
 qt5_add_resources(UI_RESOURCES ${RESOURCES})
 
@@ -97,10 +97,10 @@ include_directories(
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
+    #${Boost_INCLUDE_DIRS}
 )
 link_directories(
-    ${Boost_LIBRARY_DIRS}
+    #${Boost_LIBRARY_DIRS}
 )
 add_executable(pylet
     ${GUI_TYPE}
@@ -112,7 +112,7 @@ target_link_libraries(pylet
     Qt5::Core
     Qt5::Gui
     ${PYTHON_LIBRARIES}
-    ${Boost_LIBRARIES}
+    #${Boost_LIBRARIES}
 )
 if(MSVC)
     source_group("src\\" FILES ${CORE_SOURCE})

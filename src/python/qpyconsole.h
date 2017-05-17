@@ -27,7 +27,6 @@
 #ifndef QPYCONSOLE_H
 #define QPYCONSOLE_H
 
-#include <boost/python.hpp>
 #include "Python.h"
 #include "qconsole.h"
 #include "src/gui/info_box.h"
